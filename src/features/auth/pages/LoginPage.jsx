@@ -5,7 +5,7 @@ import UnderlinedInput from '../../../components/common/UnderlinedInput'
 import { getEmailError, isValidEmail } from '../utils/emailValidation'
 import '../styles/login.css'
 
-function LoginPage({ onLogin }) {
+function LoginPage({ onBack, onLogin }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [emailConfirmed, setEmailConfirmed] = useState(false)
@@ -68,7 +68,9 @@ function LoginPage({ onLogin }) {
       return
     }
 
-    if (window.history.length > 1) {
+    if (onBack) {
+      onBack()
+    } else if (window.history.length > 1) {
       window.history.back()
     }
   }
