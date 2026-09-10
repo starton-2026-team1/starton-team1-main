@@ -27,7 +27,9 @@ async def get_sensors(session: AsyncSession = Depends(get_db_session)) -> list[S
 
 
 @router.get("/{sensor_id}", response_model=SensorResponse)
-async def get_sensor(sensor_id: int, session: AsyncSession = Depends(get_db_session)) -> SensorResponse:
+async def get_sensor(
+    sensor_id: int, session: AsyncSession = Depends(get_db_session)
+) -> SensorResponse:
     return await find_sensor_or_404(session, sensor_id)
 
 
@@ -41,6 +43,8 @@ async def patch_sensor(
 
 
 @router.delete("/{sensor_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_sensor(sensor_id: int, session: AsyncSession = Depends(get_db_session)) -> Response:
+async def delete_sensor(
+    sensor_id: int, session: AsyncSession = Depends(get_db_session)
+) -> Response:
     await remove_sensor(session, sensor_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

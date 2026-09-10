@@ -8,7 +8,11 @@ class Settings(BaseSettings):
 
     @property
     def allowed_cors_origins(self) -> list[str]:
-        return [origin.strip().rstrip("/") for origin in self.cors_origins.split(",") if origin.strip()]
+        return [
+            origin.strip().rstrip("/")
+            for origin in self.cors_origins.split(",")
+            if origin.strip()
+        ]
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
