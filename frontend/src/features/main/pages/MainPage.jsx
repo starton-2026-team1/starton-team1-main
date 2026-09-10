@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import {
   Activity,
+  Check,
   ChevronDown,
   ChevronRight,
   FileClock,
@@ -39,7 +40,7 @@ const navigationItems = [
 
 const profileSections = [
   { title: '계정', items: ['내 정보 수정'] },
-  { title: '환경설정', items: ['알림 설정', '접근성 설정'] },
+  { title: '환경설정', items: ['알림 설정', '접근성 설정', '테마 설정'] },
   { title: '기기 및 안전', items: ['안심태그(NFC)'] },
   { title: '지원', items: ['도움말', '이용약관 및 개인정보 처리방침'] },
 ]
@@ -121,7 +122,13 @@ function HomePage({ hasSensor, onAddPerson, onConnectSensor, onStartRecording, p
   )
 }
 
-function ProfilePage() {
+function ProfilePage({ onThemeChange, theme }) {
+  const [showThemeDialog, setShowThemeDialog] = useState(false)
+  const themeOptions = [
+    { id: 'inverted', label: '반전 테마', description: '회색 배경 · 흰색 카드' },
+    { id: 'classic', label: '기본 테마', description: '흰색 배경 · 회색 카드' },
+  ]
+
   return (
     <div className="profile-view">
       <header className="page-header">
@@ -140,8 +147,10 @@ function ProfilePage() {
             <h2 id={`settings-${title}`}>{title}</h2>
             <div className="settings-list">
               {items.map((label) => (
-                <button key={label} type="button">
-                  <span>{label}</span>
+                <button key={label} type="button" onClick={() => label === '테마 설정' && setShowThemeDialog(true)}>
+                  <span className="settings-list__label">
+                    {label}
+                  </span>
                   <ChevronRight aria-hidden="true" />
                 </button>
               ))}
@@ -155,6 +164,22 @@ function ProfilePage() {
         로그아웃
       </button>
       <p className="app-version"><Info aria-hidden="true" /> 앱 버전 1.0.0</p>
+      {showThemeDialog && (
+        <div className="theme-dialog-backdrop" role="presentation" onMouseDown={() => setShowThemeDialog(false)}>
+          <section className="theme-dialog" role="dialog" aria-modal="true" aria-labelledby="theme-dialog-title" onMouseDown={(event) => event.stopPropagation()}>
+            <h2 id="theme-dialog-title">테마 설정</h2>
+            <div className="theme-dialog__options">
+              {themeOptions.map((option) => (
+                <button className={theme === option.id ? 'is-selected' : ''} type="button" key={option.id} onClick={() => { onThemeChange(option.id); setShowThemeDialog(false) }}>
+                  <span><strong>{option.label}</strong><small>{option.description}</small></span>
+                  {theme === option.id && <Check aria-label="선택됨" />}
+                </button>
+              ))}
+            </div>
+            <button className="theme-dialog__cancel" type="button" onClick={() => setShowThemeDialog(false)}>취소</button>
+          </section>
+        </div>
+      )}
     </div>
   )
 }
@@ -358,6 +383,7 @@ function SensorPage({ onAddSensor, onDeleteSensor, people, sensors }) {
 }
 
 function MainPage() {
+  const [theme, setTheme] = useState(() => window.localStorage.getItem('app-theme') || 'inverted')
   const [activePage, setActivePage] = useState('home')
   const [isRegisteringPerson, setIsRegisteringPerson] = useState(false)
   const [isRegisteringSensor, setIsRegisteringSensor] = useState(false)
@@ -396,6 +422,11 @@ function MainPage() {
 
     return () => { isActive = false }
   }, [])
+
+  useEffect(() => {
+    document.documentElement.dataset.appTheme = theme
+    window.localStorage.setItem('app-theme', theme)
+  }, [theme])
 
   useEffect(() => {
     if (!apiError) return undefined
@@ -543,7 +574,7 @@ function MainPage() {
       return <HistoryPage events={sensorEvents} people={registeredPeople} sensors={registeredSensors} />
     }
 
-    return <ProfilePage />
+    return <ProfilePage theme={theme} onThemeChange={setTheme} />
   }
 
   if (isRegisteringPerson) {
