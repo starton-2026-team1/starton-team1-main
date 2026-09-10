@@ -66,7 +66,7 @@ function SensorRegistrationPage({ people, onBack, onRegister }) {
       return <div className="step-choice-list">{people.map((person) => <button className={form.personId === person.id ? 'selected' : ''} type="button" key={person.id} onClick={() => update(person.id)}>{person.name}{form.personId === person.id && <Check aria-hidden="true" />}</button>)}</div>
     }
     if (current.field === 'type') {
-      const types = [['ultrasonic', '초음파 센서'], ['motion', '동작 감지 센서'], ['door', '문 열림 센서']]
+      const types = [['ultrasonic', '초음파 센서']]
       return <div className="step-choice-list">{types.map(([value, label]) => <button className={form.type === value ? 'selected' : ''} type="button" key={value} onClick={() => update(value)}>{label}{form.type === value && <Check aria-hidden="true" />}</button>)}</div>
     }
     const placeholders = { serialNumber: '센서 고유번호', name: '예: 거실 센서', targetObject: '예: 냉장고, 현관문', location: '예: 주방, 현관' }
