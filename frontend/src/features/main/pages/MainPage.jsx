@@ -9,6 +9,7 @@ import {
   Home,
   Info,
   LogOut,
+  MoreVertical,
   Plus,
   Radio,
   Settings,
@@ -257,6 +258,12 @@ const sensorStatusLabels = {
 }
 
 function SensorPage({ onAddSensor, people, sensors }) {
+  const [openMenuId, setOpenMenuId] = useState(null)
+
+  const closeMenu = (event) => {
+    if (!event.currentTarget.contains(event.relatedTarget)) setOpenMenuId(null)
+  }
+
   return (
     <div className="sensors-view">
       <header className="page-header sensors-view__header">
@@ -279,7 +286,26 @@ function SensorPage({ onAddSensor, people, sensors }) {
                 <h2>{sensor.name}</h2>
                 <p>{person?.name} · {sensor.location} · {sensor.targetObject}</p>
               </div>
-              <div className="sensor-card__state">
+              <div className="sensor-card__actions" onBlur={closeMenu}>
+                <button
+                  className="sensor-card__menu-button"
+                  type="button"
+                  aria-label={`${sensor.name} 관리 메뉴`}
+                  aria-haspopup="menu"
+                  aria-expanded={openMenuId === sensor.id}
+                  onClick={() => setOpenMenuId((id) => id === sensor.id ? null : sensor.id)}
+                >
+                  <MoreVertical aria-hidden="true" />
+                </button>
+                {openMenuId === sensor.id && (
+                  <div className="sensor-card__menu" role="menu">
+                    <button type="button" role="menuitem" onClick={() => setOpenMenuId(null)}>센서 수정</button>
+                    <button type="button" role="menuitem" onClick={() => setOpenMenuId(null)}>연결 해제</button>
+                    <button className="sensor-card__menu-danger" type="button" role="menuitem" onClick={() => setOpenMenuId(null)}>센서 삭제</button>
+                  </div>
+                )}
+              </div>
+              <div className="sensor-card__state" aria-label={sensorStatusLabels[sensor.status]}>
                 <span className={`sensor-status sensor-status--${sensor.status}`}>
                   <span className="visually-hidden">{sensorStatusLabels[sensor.status]}</span>
                 </span>

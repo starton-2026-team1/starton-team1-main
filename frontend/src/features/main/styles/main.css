@@ -710,9 +710,10 @@
 }
 
 .sensor-card {
+  position: relative;
   display: grid;
   min-height: 72px;
-  grid-template-columns: 40px minmax(0, 1fr) auto;
+  grid-template-columns: 40px minmax(0, 1fr) 32px;
   align-items: center;
   gap: 11px;
   padding: 11px 14px;
@@ -721,6 +722,10 @@
   background: rgb(239 241 246 / 72%);
   box-shadow: 0 6px 18px rgb(16 42 107 / 5%);
   backdrop-filter: blur(14px);
+}
+
+.sensor-card:has(.sensor-card__menu) {
+  z-index: 9;
 }
 
 .sensor-card__icon {
@@ -753,8 +758,80 @@
 }
 
 .sensor-card__state {
+  position: absolute;
+  right: 21px;
+  bottom: 13px;
   display: flex;
   align-items: center;
+}
+
+.sensor-card__actions {
+  position: relative;
+  align-self: start;
+  justify-self: end;
+}
+
+.sensor-card__menu-button {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: var(--color-placeholder);
+  background: transparent;
+  cursor: pointer;
+}
+
+.sensor-card__menu-button:hover,
+.sensor-card__menu-button[aria-expanded='true'] {
+  color: var(--color-text);
+  background: rgb(255 255 255 / 78%);
+}
+
+.sensor-card__menu-button svg {
+  width: 19px;
+}
+
+.sensor-card__menu {
+  position: absolute;
+  z-index: 8;
+  top: 36px;
+  right: 0;
+  width: 132px;
+  overflow: hidden;
+  padding: 6px;
+  border: 1px solid #e3e8f0;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 10px 28px rgb(16 42 107 / 14%);
+}
+
+.sensor-card__menu button {
+  display: block;
+  width: 100%;
+  min-height: 38px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: 9px;
+  color: var(--color-text);
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sensor-card__menu button:hover,
+.sensor-card__menu button:focus-visible {
+  background: #f3f6fb;
+  outline: 0;
+}
+
+.sensor-card__menu .sensor-card__menu-danger {
+  color: var(--color-error);
 }
 
 .sensor-status {
