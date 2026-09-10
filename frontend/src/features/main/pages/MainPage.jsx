@@ -17,7 +17,7 @@ import {
 } from 'lucide-react'
 import { createPerson, deletePerson, getPeople, updatePerson, updatePersonMonitoringStatus } from '../../../api/people'
 import { getSensorEvents } from '../../../api/sensorEvents'
-import { createSensor, deleteSensor, getSensors, updateSensor } from '../../../api/sensors'
+import { createSensor, deleteSensor, disconnectSensor, getSensors, updateSensor } from '../../../api/sensors'
 import mascot from '../../../assets/mascot.png'
 import personProfileMascot from '../../../assets/mascot-profile.png'
 import emptyMascot from '../../../assets/mascot/empty.png'
@@ -310,7 +310,7 @@ function SensorStatusIcon({ status, showLabel = false }) {
   )
 }
 
-function SensorPage({ onAddSensor, onDeleteSensor, onEditSensor, people, sensors }) {
+function SensorPage({ disconnectingSensorId, onAddSensor, onDeleteSensor, onDisconnectSensor, onEditSensor, people, sensors }) {
   const [openMenuId, setOpenMenuId] = useState(null)
 
   const closeMenu = (event) => {
@@ -362,7 +362,15 @@ function SensorPage({ onAddSensor, onDeleteSensor, onEditSensor, people, sensors
                         onEditSensor(sensor)
                       }}
                     >센서 수정</button>
-                    <button type="button" role="menuitem" onClick={() => setOpenMenuId(null)}>연결 해제</button>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      disabled={disconnectingSensorId === sensor.id || sensor.status === 'disconnected'}
+                      onClick={() => {
+                        setOpenMenuId(null)
+                        onDisconnectSensor(sensor)
+                      }}
+                    >{disconnectingSensorId === sensor.id ? '연결 해제 중...' : '연결 해제'}</button>
                     <button
                       className="sensor-card__menu-danger"
                       type="button"
@@ -405,6 +413,7 @@ function MainPage() {
   const [sensorEvents, setSensorEvents] = useState([])
   const [sensorToDelete, setSensorToDelete] = useState(null)
   const [isDeletingSensor, setIsDeletingSensor] = useState(false)
+  const [disconnectingSensorId, setDisconnectingSensorId] = useState(null)
   const [personToStopMonitoring, setPersonToStopMonitoring] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [apiError, setApiError] = useState('')
@@ -486,6 +495,20 @@ function MainPage() {
     }
   }
 
+  const disconnectRegisteredSensor = async (sensor) => {
+    setDisconnectingSensorId(sensor.id)
+    try {
+      const updated = await disconnectSensor(sensor.id)
+      setRegisteredSensors((sensors) => sensors.map((item) => (
+        item.id === updated.id ? updated : item
+      )))
+    } catch (error) {
+      setApiError(error.message || '센서 연결을 해제하지 못했어요.')
+    } finally {
+      setDisconnectingSensorId(null)
+    }
+  }
+
   const renderPage = () => {
     if (isLoading) {
       return <EmptyState title="정보를 불러오고 있어요" description="잠시만 기다려 주세요." />
@@ -546,10 +569,12 @@ function MainPage() {
       if (registeredSensors.length > 0) {
         return (
           <SensorPage
+            disconnectingSensorId={disconnectingSensorId}
             sensors={registeredSensors}
             people={registeredPeople}
             onAddSensor={() => setIsRegisteringSensor(true)}
             onDeleteSensor={setSensorToDelete}
+            onDisconnectSensor={disconnectRegisteredSensor}
             onEditSensor={setEditingSensor}
           />
         )
