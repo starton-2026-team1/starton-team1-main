@@ -280,6 +280,10 @@
   background: var(--color-primary);
 }
 
+.home-warning-actions .home-safety-confirm-action {
+  border-color: var(--color-primary);
+}
+
 .home-warning-actions button:disabled {
   opacity: 0.55;
   cursor: not-allowed;

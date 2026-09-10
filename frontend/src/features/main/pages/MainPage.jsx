@@ -526,10 +526,6 @@ function MainPage() {
             sensors={registeredSensors}
             events={sensorEvents}
             onOpenPerson={() => setActivePage('people')}
-            onOpenHistory={() => {
-              setHistoryInitialTab('records')
-              setActivePage('history')
-            }}
           />
         )
       }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { ChevronRight, Phone, Radio } from 'lucide-react'
+import { ChevronRight, Phone, Radio, ShieldCheck } from 'lucide-react'
 import personProfileMascot from '../../../assets/mascot-profile.png'
 import alertMascot from '../../../assets/mascot/alert.png'
 import profileMascot from '../../../assets/mascot/normal.png'
@@ -68,7 +68,7 @@ function ActivitySummary({ model }) {
   )
 }
 
-function WarningStatus({ model, onOpenHistory }) {
+function WarningStatus({ model }) {
   const callTarget = () => {
     if (model.person.phone) window.location.href = `tel:${model.person.phone}`
   }
@@ -87,7 +87,9 @@ function WarningStatus({ model, onOpenHistory }) {
         <button className="primary-action" type="button" onClick={callTarget} disabled={!model.person.phone}>
           <Phone aria-hidden="true" />대상자에게 전화하기
         </button>
-        <button type="button" onClick={onOpenHistory}>센서 기록 확인</button>
+        <button className="home-safety-confirm-action" type="button">
+          <ShieldCheck aria-hidden="true" />안전을 확인했어요
+        </button>
       </div>
 
       <section className="home-dashboard__section home-evidence" aria-labelledby="situation-evidence-title">
@@ -108,7 +110,7 @@ function WarningStatus({ model, onOpenHistory }) {
   )
 }
 
-export default function HomeDashboard({ events, onOpenHistory, onOpenPerson, person, sensors }) {
+export default function HomeDashboard({ events, onOpenPerson, person, sensors }) {
   const [now, setNow] = useState(() => new Date())
 
   useEffect(() => {
@@ -146,7 +148,7 @@ export default function HomeDashboard({ events, onOpenHistory, onOpenPerson, per
       <DashboardHeader person={person} warning={model.isWarning} />
       <PersonOverview model={model} onOpenPerson={onOpenPerson} />
       {model.isWarning
-        ? <WarningStatus model={model} onOpenHistory={onOpenHistory} />
+        ? <WarningStatus model={model} />
         : <NormalStatus model={model} />}
       <ActivitySummary model={model} />
     </div>
