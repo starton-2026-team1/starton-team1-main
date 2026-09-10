@@ -387,6 +387,7 @@ function SensorPage({ onAddSensor, onDeleteSensor, people, sensors }) {
 function MainPage() {
   const [theme, setTheme] = useState(() => window.localStorage.getItem('app-theme') || 'inverted')
   const [activePage, setActivePage] = useState('home')
+  const [historyInitialTab, setHistoryInitialTab] = useState('analysis')
   const [isRegisteringPerson, setIsRegisteringPerson] = useState(false)
   const [isRegisteringSensor, setIsRegisteringSensor] = useState(false)
   const [editingPerson, setEditingPerson] = useState(null)
@@ -490,7 +491,10 @@ function MainPage() {
             sensors={registeredSensors}
             events={sensorEvents}
             onOpenPerson={() => setActivePage('people')}
-            onOpenHistory={() => setActivePage('history')}
+            onOpenHistory={() => {
+              setHistoryInitialTab('records')
+              setActivePage('history')
+            }}
           />
         )
       }
@@ -575,7 +579,7 @@ function MainPage() {
         )
       }
 
-      return <HistoryPage events={sensorEvents} people={registeredPeople} sensors={registeredSensors} />
+      return <HistoryPage events={sensorEvents} initialTab={historyInitialTab} people={registeredPeople} sensors={registeredSensors} />
     }
 
     return <ProfilePage theme={theme} onThemeChange={setTheme} />
@@ -654,7 +658,10 @@ function MainPage() {
                 className={className}
                 type="button"
                 aria-current={isActive ? 'page' : undefined}
-                onClick={() => setActivePage(id)}
+            onClick={() => {
+              if (id === 'history') setHistoryInitialTab('analysis')
+              setActivePage(id)
+            }}
               >
                 <Icon aria-hidden="true" />
                 <span>{label}</span>

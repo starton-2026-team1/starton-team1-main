@@ -70,8 +70,8 @@ function EventRows({ events, sensors, limit, showEmpty = true }) {
   )
 }
 
-export default function HistoryPage({ events, people, sensors }) {
-  const [activeTab, setActiveTab] = useState('analysis')
+export default function HistoryPage({ events, initialTab = 'analysis', people, sensors }) {
+  const [activeTab, setActiveTab] = useState(initialTab)
   const [personId, setPersonId] = useState(people[0]?.id || '')
   const [sensorFilter, setSensorFilter] = useState('all')
   const selectedPerson = people.find(({ id }) => id === personId) || people[0]
