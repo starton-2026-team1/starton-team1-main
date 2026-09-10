@@ -21,9 +21,7 @@
 }
 
 .detail-action-buttons .detail-action-buttons__secondary {
-  border-color: var(--color-danger-border);
   color: var(--color-error);
-  background: rgb(255 247 247 / 86%);
 }
 
 .detail-action-buttons button:disabled {
