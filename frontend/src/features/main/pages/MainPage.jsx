@@ -16,6 +16,9 @@ import {
   UserRound,
   UsersRound,
 } from 'lucide-react'
+import { createPerson, getPeople } from '../../../api/people'
+import { getSensorEvents } from '../../../api/sensorEvents'
+import { createSensor, getSensors } from '../../../api/sensors'
 import mascot from '../../../assets/mascot.png'
 import emptyMascot from '../../../assets/mascot/empty.png'
 import profileMascot from '../../../assets/mascot/normal.png'
@@ -274,6 +277,45 @@ function SensorPage({ onAddSensor, people, sensors }) {
   )
 }
 
+function HistoryPage({ events, people, sensors }) {
+  if (events.length === 0) {
+    return (
+      <EmptyState
+        title="아직 기록이 없어요"
+        description="센서가 작동하면 활동 기록이 여기에 쌓여요."
+      />
+    )
+  }
+
+  return (
+    <div className="history-view">
+      <header className="page-header">
+        <h1>기록</h1>
+        <p>최근 센서 활동 {events.length}건</p>
+      </header>
+      <div className="history-list">
+        {events.map((event) => {
+          const person = people.find(({ id }) => id === event.personId)
+          const sensor = sensors.find(({ id }) => id === event.sensorId)
+          const detectedAt = new Date(event.detectedAt)
+          return (
+            <article className="history-card" key={event.id}>
+              <div className="history-card__icon"><FileClock aria-hidden="true" /></div>
+              <div>
+                <h2>{sensor?.name || `센서 ${event.sensorId}`}</h2>
+                <p>{person?.name || `대상자 ${event.personId}`} · {event.detectedValue}</p>
+                <time dateTime={event.detectedAt}>
+                  {Number.isNaN(detectedAt.getTime()) ? event.detectedAt : detectedAt.toLocaleString('ko-KR')}
+                </time>
+              </div>
+            </article>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 function MainPage() {
   const [activePage, setActivePage] = useState('home')
   const [isRegisteringPerson, setIsRegisteringPerson] = useState(false)
@@ -281,9 +323,46 @@ function MainPage() {
   const [isRecordingStarted, setIsRecordingStarted] = useState(false)
   const [registeredPeople, setRegisteredPeople] = useState([])
   const [registeredSensors, setRegisteredSensors] = useState([])
+  const [sensorEvents, setSensorEvents] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [apiError, setApiError] = useState('')
   const activeItem = navigationItems.find(({ id }) => id === activePage)
+  const primaryPerson = registeredPeople[0]
+  const hasLinkedSensor = Boolean(primaryPerson) && registeredSensors.some(
+    ({ personId }) => personId === primaryPerson.id,
+  )
+
+  useEffect(() => {
+    let isActive = true
+
+    Promise.all([getPeople(), getSensors(), getSensorEvents()])
+      .then(([people, sensors, events]) => {
+        if (!isActive) return
+        setRegisteredPeople(people)
+        setRegisteredSensors(sensors)
+        setSensorEvents(events)
+      })
+      .catch((error) => {
+        if (isActive) setApiError(error.message || '데이터를 불러오지 못했어요.')
+      })
+      .finally(() => {
+        if (isActive) setIsLoading(false)
+      })
+
+    return () => { isActive = false }
+  }, [])
+
+  useEffect(() => {
+    if (!apiError) return undefined
+    const timer = window.setTimeout(() => setApiError(''), 3000)
+    return () => window.clearTimeout(timer)
+  }, [apiError])
 
   const renderPage = () => {
+    if (isLoading) {
+      return <EmptyState title="정보를 불러오고 있어요" description="잠시만 기다려 주세요." />
+    }
+
     if (activePage === 'home') {
       if (isRecordingStarted) {
         return <div className="recording-home" aria-label="기록 중 홈" />
@@ -291,8 +370,8 @@ function MainPage() {
 
       return (
         <HomePage
-          person={registeredPeople[0]}
-          hasSensor={registeredSensors.length > 0}
+          person={primaryPerson}
+          hasSensor={hasLinkedSensor}
           onAddPerson={() => setIsRegisteringPerson(true)}
           onConnectSensor={() => setActivePage('sensor')}
           onStartRecording={() => setIsRecordingStarted(true)}
@@ -354,12 +433,7 @@ function MainPage() {
     }
 
     if (activePage === 'history') {
-      return (
-        <EmptyState
-          title="아직 기록이 없어요"
-          description={registeredSensors.length > 0 ? '' : '센서를 연결하면 활동과 알림 기록이 쌓여요.'}
-        />
-      )
+      return <HistoryPage events={sensorEvents} people={registeredPeople} sensors={registeredSensors} />
     }
 
     return <ProfilePage />
@@ -369,11 +443,9 @@ function MainPage() {
     return (
       <PersonRegistrationPage
         onBack={() => setIsRegisteringPerson(false)}
-        onRegister={(person) => {
-          setRegisteredPeople((people) => [
-            ...people,
-            { ...person, id: crypto.randomUUID() },
-          ])
+        onRegister={async (person) => {
+          const created = await createPerson(person)
+          setRegisteredPeople((people) => [...people, created])
           setActivePage('people')
           setIsRegisteringPerson(false)
         }}
@@ -386,11 +458,9 @@ function MainPage() {
       <SensorRegistrationPage
         people={registeredPeople}
         onBack={() => setIsRegisteringSensor(false)}
-        onRegister={(sensor) => {
-          setRegisteredSensors((sensors) => [
-            ...sensors,
-            { ...sensor, id: crypto.randomUUID() },
-          ])
+        onRegister={async (sensor) => {
+          const created = await createSensor(sensor)
+          setRegisteredSensors((sensors) => [...sensors, created])
           setActivePage('sensor')
           setIsRegisteringSensor(false)
         }}
@@ -425,6 +495,7 @@ function MainPage() {
             )
           })}
         </nav>
+        {apiError && <NoticeToast>{apiError}</NoticeToast>}
       </section>
     </main>
   )

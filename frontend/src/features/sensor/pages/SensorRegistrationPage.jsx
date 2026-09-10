@@ -22,6 +22,7 @@ function SensorRegistrationPage({ people, onBack, onRegister }) {
   const [step, setStep] = useState(0)
   const [error, setError] = useState('')
   const [connectionStatus, setConnectionStatus] = useState('idle')
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const current = steps[step]
 
   useEffect(() => {
@@ -37,18 +38,26 @@ function SensorRegistrationPage({ people, onBack, onRegister }) {
 
   const handleBack = () => step > 0 ? setStep((value) => value - 1) : onBack?.()
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
     if (current.field === 'connection') {
       if (connectionStatus === 'success') setStep((value) => value + 1)
       return
     }
-    if (!form[current.field]?.trim()) {
+    if (!String(form[current.field] ?? '').trim()) {
       setError('필수 정보를 입력해 주세요.')
       return
     }
-    if (step === steps.length - 1) onRegister?.({ ...form, status: 'normal' })
-    else setStep((value) => value + 1)
+    if (step === steps.length - 1) {
+      setIsSubmitting(true)
+      try {
+        await onRegister?.({ ...form, status: 'normal' })
+      } catch (submitError) {
+        setError(submitError.message || '센서를 등록하지 못했어요.')
+      } finally {
+        setIsSubmitting(false)
+      }
+    } else setStep((value) => value + 1)
   }
 
   const renderInput = () => {
@@ -73,10 +82,11 @@ function SensorRegistrationPage({ people, onBack, onRegister }) {
   }
 
   return (
-    <StepFormLayout ariaLabel="센서 등록" currentStep={step} totalSteps={steps.length} onBack={handleBack} onSubmit={handleSubmit} actionLabel={step === steps.length - 1 ? '등록하기' : '다음'} actionDisabled={current.field === 'connection' && connectionStatus !== 'success'}>
+    <StepFormLayout ariaLabel="센서 등록" currentStep={step} totalSteps={steps.length} onBack={handleBack} onSubmit={handleSubmit} actionLabel={isSubmitting ? '등록 중...' : step === steps.length - 1 ? '등록하기' : '다음'} actionDisabled={isSubmitting || (current.field === 'connection' && connectionStatus !== 'success')}>
       <h1 className="step-form-question">{current.question}</h1>
       {current.field === 'serialNumber' && <p className="step-form-description">센서 뒷면에 적힌 번호를 확인해 주세요.</p>}
       {renderInput()}
+      {error && ['connection', 'personId', 'type'].includes(current.field) && <p className="step-form-server-error" role="alert">{error}</p>}
     </StepFormLayout>
   )
 }

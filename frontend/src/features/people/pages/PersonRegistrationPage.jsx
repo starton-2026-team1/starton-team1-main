@@ -20,6 +20,7 @@ function PersonRegistrationPage({ onBack, onRegister }) {
   const [form, setForm] = useState(initialForm)
   const [step, setStep] = useState(0)
   const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const current = steps[step]
 
   const update = (field, value) => {
@@ -29,7 +30,7 @@ function PersonRegistrationPage({ onBack, onRegister }) {
 
   const handleBack = () => step > 0 ? setStep((value) => value - 1) : onBack?.()
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
     const value = form[current.field]?.trim()
 
@@ -41,8 +42,16 @@ function PersonRegistrationPage({ onBack, onRegister }) {
       setError('연락처를 정확히 입력하거나 건너뛰어 주세요.')
       return
     }
-    if (step === steps.length - 1) onRegister?.(form)
-    else setStep((valueStep) => valueStep + 1)
+    if (step === steps.length - 1) {
+      setIsSubmitting(true)
+      try {
+        await onRegister?.(form)
+      } catch (submitError) {
+        setError(submitError.message || '대상자를 등록하지 못했어요.')
+      } finally {
+        setIsSubmitting(false)
+      }
+    } else setStep((valueStep) => valueStep + 1)
   }
 
   const phoneChange = (event) => {
@@ -70,10 +79,11 @@ function PersonRegistrationPage({ onBack, onRegister }) {
   const isOptionalStep = ['ageGroup', 'phone', 'healthNotes'].includes(current.field)
 
   return (
-    <StepFormLayout ariaLabel="대상자 등록" currentStep={step} totalSteps={steps.length} onBack={handleBack} onSubmit={handleSubmit} actionLabel={step === steps.length - 1 ? '등록하기' : isOptionalStep && !form[current.field] ? '건너뛰기' : '다음'}>
+    <StepFormLayout ariaLabel="대상자 등록" currentStep={step} totalSteps={steps.length} onBack={handleBack} onSubmit={handleSubmit} actionDisabled={isSubmitting} actionLabel={isSubmitting ? '등록 중...' : step === steps.length - 1 ? '등록하기' : isOptionalStep && !form[current.field] ? '건너뛰기' : '다음'}>
       <h1 className="step-form-question">{current.question}</h1>
       <p className="step-form-description">{current.description}</p>
       {renderInput()}
+      {error && ['ageGroup', 'healthNotes'].includes(current.field) && <p className="step-form-server-error" role="alert">{error}</p>}
     </StepFormLayout>
   )
 }
