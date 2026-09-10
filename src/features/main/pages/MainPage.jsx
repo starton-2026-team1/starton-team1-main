@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Activity,
   Bell,
@@ -19,6 +19,7 @@ import {
 import mascot from '../../../assets/mascot.png'
 import emptyMascot from '../../../assets/mascot/empty.png'
 import profileMascot from '../../../assets/mascot/normal.png'
+import NoticeToast from '../../../components/common/NoticeToast'
 import PersonRegistrationPage from '../../people/pages/PersonRegistrationPage'
 import SensorRegistrationPage from '../../sensor/pages/SensorRegistrationPage'
 import '../styles/main.css'
@@ -197,12 +198,20 @@ function PersonCard({ defaultExpanded, person, onConnectSensor, sensorCount }) {
   )
 }
 
-function PeoplePage({ people, onAddPerson, onConnectSensor, sensors }) {
+function PeoplePage({ people, onConnectSensor, sensors }) {
+  const [showLimitNotice, setShowLimitNotice] = useState(false)
+
+  useEffect(() => {
+    if (!showLimitNotice) return undefined
+    const timer = window.setTimeout(() => setShowLimitNotice(false), 2400)
+    return () => window.clearTimeout(timer)
+  }, [showLimitNotice])
+
   return (
     <div className="people-view">
       <header className="page-header people-view__header">
         <h1>대상자</h1>
-        <button type="button" aria-label="대상자 추가" onClick={onAddPerson}>
+        <button type="button" aria-label="대상자 추가" onClick={() => setShowLimitNotice(true)}>
           <Plus aria-hidden="true" />
         </button>
       </header>
@@ -218,6 +227,7 @@ function PeoplePage({ people, onAddPerson, onConnectSensor, sensors }) {
           />
         ))}
       </div>
+      {showLimitNotice && <NoticeToast>현재 대상자는 1명만 등록할 수 있어요.</NoticeToast>}
     </div>
   )
 }
@@ -296,7 +306,6 @@ function MainPage() {
           <PeoplePage
             people={registeredPeople}
             sensors={registeredSensors}
-            onAddPerson={() => setIsRegisteringPerson(true)}
             onConnectSensor={() => setActivePage('sensor')}
           />
         )
