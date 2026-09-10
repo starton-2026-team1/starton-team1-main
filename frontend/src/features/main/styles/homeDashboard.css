@@ -167,21 +167,24 @@
 .home-activity-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 9px;
+  gap: 0;
 }
 
 .home-activity-grid article {
   display: flex;
-  min-height: 92px;
+  min-height: 76px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 12px 6px;
-  border: 1px solid rgb(255 255 255 / 82%);
-  border-radius: 18px;
-  background: rgb(239 241 246 / 72%);
-  box-shadow: 0 6px 18px rgb(16 42 107 / 4%);
+  gap: 8px;
+  padding: 6px 8px;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.home-activity-grid article + article {
+  border-left: 1px solid #dfe5ee;
 }
 
 .home-activity-grid span {
@@ -191,7 +194,7 @@
 
 .home-activity-grid strong {
   color: var(--color-text);
-  font-size: 14px;
+  font-size: 16px;
   text-align: center;
 }
 

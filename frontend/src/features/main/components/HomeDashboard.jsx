@@ -47,9 +47,9 @@ function ActivitySummary({ model }) {
       <section className="home-dashboard__section" aria-labelledby="today-activity-title">
         <h2 id="today-activity-title">오늘 활동</h2>
         <div className="home-activity-grid">
-          <article><span>활동량</span><strong>{activity}</strong></article>
-          <article><span>마지막 감지</span><strong>{model.latestElapsed}</strong></article>
-          <article><span>오늘 감지</span><strong>{model.events.length}회</strong></article>
+          <article><strong>{activity}</strong><span>활동량</span></article>
+          <article><strong>{model.latestElapsed}</strong><span>마지막 감지</span></article>
+          <article><strong>{model.events.length}회</strong><span>오늘 감지</span></article>
         </div>
       </section>
 
