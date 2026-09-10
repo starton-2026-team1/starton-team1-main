@@ -16,8 +16,10 @@ const steps = [
 const ageGroups = ['60대 이하', '70대', '80대', '90대 이상']
 const initialForm = { name: '', ageGroup: '', phone: '', livingSpace: '', healthNotes: '' }
 
-function PersonRegistrationPage({ onBack, onRegister }) {
-  const [form, setForm] = useState(initialForm)
+function PersonRegistrationPage({ initialPerson, onBack, onRegister }) {
+  const [form, setForm] = useState(() => initialPerson
+    ? { ...initialForm, ...initialPerson }
+    : initialForm)
   const [step, setStep] = useState(0)
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -47,7 +49,7 @@ function PersonRegistrationPage({ onBack, onRegister }) {
       try {
         await onRegister?.(form)
       } catch (submitError) {
-        setError(submitError.message || '대상자를 등록하지 못했어요.')
+        setError(submitError.message || `대상자 정보를 ${initialPerson ? '수정' : '등록'}하지 못했어요.`)
       } finally {
         setIsSubmitting(false)
       }
@@ -79,7 +81,7 @@ function PersonRegistrationPage({ onBack, onRegister }) {
   const isOptionalStep = ['ageGroup', 'phone', 'healthNotes'].includes(current.field)
 
   return (
-    <StepFormLayout ariaLabel="대상자 등록" currentStep={step} totalSteps={steps.length} onBack={handleBack} onSubmit={handleSubmit} actionDisabled={isSubmitting} actionLabel={isSubmitting ? '등록 중...' : step === steps.length - 1 ? '등록하기' : isOptionalStep && !form[current.field] ? '건너뛰기' : '다음'}>
+    <StepFormLayout ariaLabel={`대상자 정보 ${initialPerson ? '수정' : '등록'}`} currentStep={step} totalSteps={steps.length} onBack={handleBack} onSubmit={handleSubmit} actionDisabled={isSubmitting} actionLabel={isSubmitting ? `${initialPerson ? '수정' : '등록'} 중...` : step === steps.length - 1 ? `${initialPerson ? '수정' : '등록'}하기` : isOptionalStep && !form[current.field] ? '건너뛰기' : '다음'}>
       <h1 className="step-form-question">{current.question}</h1>
       <p className="step-form-description">{current.description}</p>
       {renderInput()}

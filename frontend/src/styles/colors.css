@@ -8,6 +8,9 @@
   --color-placeholder: #7488b1;
   --color-border: #c8d3e8;
   --color-border-active: #246bfd;
+  --color-divider: #eef1f5;
   --color-error: #d43c3c;
+  --color-danger-border: #f0caca;
+  --color-danger-surface: #fff7f7;
   --color-shadow: rgba(37, 72, 138, 0.08);
 }

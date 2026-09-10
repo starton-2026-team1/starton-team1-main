@@ -37,3 +37,17 @@ export async function updatePersonMonitoringStatus(personId, monitoringStatus) {
   })
   return toPerson(updated)
 }
+
+export async function updatePerson(personId, person) {
+  const updated = await apiRequest(`/people/${personId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      name: person.name,
+      age_group: person.ageGroup || null,
+      phone: person.phone || null,
+      living_space: person.livingSpace,
+      health_notes: person.healthNotes || null,
+    }),
+  })
+  return toPerson(updated)
+}

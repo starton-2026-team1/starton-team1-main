@@ -1,0 +1,37 @@
+.detail-action-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.detail-action-buttons button {
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid rgb(255 255 255 / 82%);
+  border-radius: 18px;
+  color: var(--color-primary);
+  background: rgb(239 241 246 / 72%);
+  box-shadow: 0 6px 18px rgb(16 42 107 / 6%);
+  backdrop-filter: blur(14px);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.detail-action-buttons .detail-action-buttons__secondary {
+  border-color: var(--color-danger-border);
+  color: var(--color-error);
+  background: rgb(255 247 247 / 86%);
+}
+
+.detail-action-buttons button:disabled {
+  opacity: 0.52;
+  cursor: not-allowed;
+}
+
+.detail-action-buttons button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}

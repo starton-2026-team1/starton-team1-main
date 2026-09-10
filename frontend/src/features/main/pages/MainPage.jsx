@@ -16,13 +16,14 @@ import {
   UserRound,
   UsersRound,
 } from 'lucide-react'
-import { createPerson, getPeople, updatePersonMonitoringStatus } from '../../../api/people'
+import { createPerson, getPeople, updatePerson, updatePersonMonitoringStatus } from '../../../api/people'
 import { getSensorEvents } from '../../../api/sensorEvents'
 import { createSensor, getSensors } from '../../../api/sensors'
 import mascot from '../../../assets/mascot.png'
 import emptyMascot from '../../../assets/mascot/empty.png'
 import profileMascot from '../../../assets/mascot/normal.png'
 import NoticeToast from '../../../components/common/NoticeToast'
+import DetailActionButtons from '../../../components/common/DetailActionButtons'
 import PersonRegistrationPage from '../../people/pages/PersonRegistrationPage'
 import SensorRegistrationPage from '../../sensor/pages/SensorRegistrationPage'
 import HomeDashboard from '../components/HomeDashboard'
@@ -154,7 +155,7 @@ function ProfilePage() {
   )
 }
 
-function PersonCard({ defaultExpanded, person, onConnectSensor, sensorCount }) {
+function PersonCard({ defaultExpanded, isUpdating, onConnectSensor, onEdit, onStopMonitoring, person, sensorCount }) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded)
 
   return (
@@ -176,33 +177,42 @@ function PersonCard({ defaultExpanded, person, onConnectSensor, sensorCount }) {
       </button>
 
       {isExpanded && (
-        <div className="person-accordion__content">
-          <section className="person-detail-section" aria-label={`${person.name} 기본 정보`}>
-            <h3>기본 정보</h3>
-            <dl className="person-details">
-              <div><dt>연령대</dt><dd>{person.ageGroup || '-'}</dd></div>
-              <div><dt>연락처</dt><dd>{person.phone || '-'}</dd></div>
-              <div><dt>생활공간</dt><dd>{person.livingSpace}</dd></div>
-            </dl>
-          </section>
+        <>
+          <div className="person-accordion__content">
+            <section className="person-detail-section" aria-label={`${person.name} 기본 정보`}>
+              <h3>기본 정보</h3>
+              <dl className="person-details">
+                <div><dt>연령대</dt><dd>{person.ageGroup || '-'}</dd></div>
+                <div><dt>연락처</dt><dd>{person.phone || '-'}</dd></div>
+                <div><dt>생활공간</dt><dd>{person.livingSpace}</dd></div>
+              </dl>
+            </section>
 
-          <section className="person-notes-section" aria-label={`${person.name} 건강 및 거동 참고사항`}>
-            <h3>건강·거동 참고사항</h3>
-            <p>{person.healthNotes || '등록된 참고사항이 없어요.'}</p>
-          </section>
+            <section className="person-notes-section" aria-label={`${person.name} 건강 및 거동 참고사항`}>
+              <h3>건강·거동 참고사항</h3>
+              <p>{person.healthNotes || '등록된 참고사항이 없어요.'}</p>
+            </section>
 
-          <button className="person-sensor-link" type="button" onClick={onConnectSensor}>
-            <span>연결된 센서</span>
-            <strong>{sensorCount > 0 ? `${sensorCount}개` : '연결하기'}</strong>
-            <ChevronRight aria-hidden="true" />
-          </button>
-        </div>
+            <button className="person-sensor-link" type="button" onClick={onConnectSensor}>
+              <span>연결된 센서</span>
+              <strong>{sensorCount > 0 ? `${sensorCount}개` : '연결하기'}</strong>
+              <ChevronRight aria-hidden="true" />
+            </button>
+          </div>
+          <DetailActionButtons
+            primaryLabel="정보수정"
+            onPrimary={onEdit}
+            secondaryLabel={isUpdating ? '중지 중...' : '모니터링 중지'}
+            onSecondary={onStopMonitoring}
+            secondaryDisabled={isUpdating || person.monitoringStatus !== 'ACTIVE'}
+          />
+        </>
       )}
     </article>
   )
 }
 
-function PeoplePage({ people, onConnectSensor, sensors }) {
+function PeoplePage({ people, onConnectSensor, onEditPerson, onStopMonitoring, sensors, updatingPersonId }) {
   const [showLimitNotice, setShowLimitNotice] = useState(false)
 
   useEffect(() => {
@@ -227,6 +237,9 @@ function PeoplePage({ people, onConnectSensor, sensors }) {
             person={person}
             defaultExpanded={index === 0}
             onConnectSensor={onConnectSensor}
+            onEdit={() => onEditPerson(person)}
+            onStopMonitoring={() => onStopMonitoring(person)}
+            isUpdating={updatingPersonId === person.id}
             sensorCount={sensors.filter(({ personId }) => personId === person.id).length}
           />
         ))}
@@ -321,6 +334,8 @@ function MainPage() {
   const [activePage, setActivePage] = useState('home')
   const [isRegisteringPerson, setIsRegisteringPerson] = useState(false)
   const [isRegisteringSensor, setIsRegisteringSensor] = useState(false)
+  const [editingPerson, setEditingPerson] = useState(null)
+  const [updatingPersonId, setUpdatingPersonId] = useState(null)
   const [registeredPeople, setRegisteredPeople] = useState([])
   const [registeredSensors, setRegisteredSensors] = useState([])
   const [sensorEvents, setSensorEvents] = useState([])
@@ -370,6 +385,20 @@ function MainPage() {
     }
   }
 
+  const stopMonitoring = async (person) => {
+    setUpdatingPersonId(person.id)
+    try {
+      const updatedPerson = await updatePersonMonitoringStatus(person.id, 'PAUSED')
+      setRegisteredPeople((people) => people.map((item) => (
+        item.id === updatedPerson.id ? updatedPerson : item
+      )))
+    } catch (error) {
+      setApiError(error.message || '모니터링을 중지하지 못했어요.')
+    } finally {
+      setUpdatingPersonId(null)
+    }
+  }
+
   const renderPage = () => {
     if (isLoading) {
       return <EmptyState title="정보를 불러오고 있어요" description="잠시만 기다려 주세요." />
@@ -406,6 +435,9 @@ function MainPage() {
             people={registeredPeople}
             sensors={registeredSensors}
             onConnectSensor={() => setActivePage('sensor')}
+            onEditPerson={setEditingPerson}
+            onStopMonitoring={stopMonitoring}
+            updatingPersonId={updatingPersonId}
           />
         )
       }
@@ -468,6 +500,23 @@ function MainPage() {
           setRegisteredPeople((people) => [...people, created])
           setActivePage('people')
           setIsRegisteringPerson(false)
+        }}
+      />
+    )
+  }
+
+
+  if (editingPerson) {
+    return (
+      <PersonRegistrationPage
+        initialPerson={editingPerson}
+        onBack={() => setEditingPerson(null)}
+        onRegister={async (person) => {
+          const updated = await updatePerson(editingPerson.id, person)
+          setRegisteredPeople((people) => people.map((item) => (
+            item.id === updated.id ? updated : item
+          )))
+          setEditingPerson(null)
         }}
       />
     )
