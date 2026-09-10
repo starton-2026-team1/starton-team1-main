@@ -25,6 +25,7 @@ import profileMascot from '../../../assets/mascot/normal.png'
 import NoticeToast from '../../../components/common/NoticeToast'
 import PersonRegistrationPage from '../../people/pages/PersonRegistrationPage'
 import SensorRegistrationPage from '../../sensor/pages/SensorRegistrationPage'
+import HomeDashboard from '../components/HomeDashboard'
 import '../styles/main.css'
 
 const navigationItems = [
@@ -376,7 +377,15 @@ function MainPage() {
 
     if (activePage === 'home') {
       if (isRecordingStarted) {
-        return <div className="recording-home" aria-label="기록 중 홈" />
+        return (
+          <HomeDashboard
+            person={primaryPerson}
+            sensors={registeredSensors}
+            events={sensorEvents}
+            onOpenPerson={() => setActivePage('people')}
+            onOpenHistory={() => setActivePage('history')}
+          />
+        )
       }
 
       return (
