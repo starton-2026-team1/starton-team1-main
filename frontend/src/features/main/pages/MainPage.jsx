@@ -27,6 +27,7 @@ import DetailActionButtons from '../../../components/common/DetailActionButtons'
 import PersonRegistrationPage from '../../people/pages/PersonRegistrationPage'
 import SensorRegistrationPage from '../../sensor/pages/SensorRegistrationPage'
 import HomeDashboard from '../components/HomeDashboard'
+import HistoryPage from '../components/HistoryPage'
 import '../styles/main.css'
 
 const navigationItems = [
@@ -282,45 +283,6 @@ function SensorPage({ onAddSensor, people, sensors }) {
                 <span className={`sensor-status sensor-status--${sensor.status}`}>
                   <span className="visually-hidden">{sensorStatusLabels[sensor.status]}</span>
                 </span>
-              </div>
-            </article>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
-function HistoryPage({ events, people, sensors }) {
-  if (events.length === 0) {
-    return (
-      <EmptyState
-        title="아직 기록이 없어요"
-        description="센서가 작동하면 활동 기록이 여기에 쌓여요."
-      />
-    )
-  }
-
-  return (
-    <div className="history-view">
-      <header className="page-header">
-        <h1>기록</h1>
-        <p>최근 센서 활동 {events.length}건</p>
-      </header>
-      <div className="history-list">
-        {events.map((event) => {
-          const person = people.find(({ id }) => id === event.personId)
-          const sensor = sensors.find(({ id }) => id === event.sensorId)
-          const detectedAt = new Date(event.detectedAt)
-          return (
-            <article className="history-card" key={event.id}>
-              <div className="history-card__icon"><FileClock aria-hidden="true" /></div>
-              <div>
-                <h2>{sensor?.name || `센서 ${event.sensorId}`}</h2>
-                <p>{person?.name || `대상자 ${event.personId}`} · {event.detectedValue}</p>
-                <time dateTime={event.detectedAt}>
-                  {Number.isNaN(detectedAt.getTime()) ? event.detectedAt : detectedAt.toLocaleString('ko-KR')}
-                </time>
               </div>
             </article>
           )
