@@ -16,6 +16,10 @@ const formatTime = (date) => new Intl.DateTimeFormat('ko-KR', {
 
 const formatShortDate = (date) => `${date.getMonth() + 1}.${date.getDate()}`
 
+const formatWeekday = (date) => new Intl.DateTimeFormat('ko-KR', {
+  weekday: 'short',
+}).format(date).replace('요일', '')
+
 const getDayEvents = (events, day) => events.filter(({ date }) => (
   date >= day && date < new Date(day.getTime() + DAY_MS)
 ))
@@ -53,8 +57,9 @@ export function createHistoryAnalysis(person, sensors, events, now = new Date())
     .sort((a, b) => a.date - b.date)
 
   const today = startOfDay(now)
+  const periodEnd = new Date(today.getTime() - DAY_MS)
   const days = Array.from({ length: 7 }, (_, index) => (
-    new Date(today.getTime() - (6 - index) * DAY_MS)
+    new Date(periodEnd.getTime() - (6 - index) * DAY_MS)
   ))
   const previousDays = days.map((day) => new Date(day.getTime() - 7 * DAY_MS))
   const counts = days.map((day) => getDayEvents(personEvents, day).length)
@@ -64,7 +69,7 @@ export function createHistoryAnalysis(person, sensors, events, now = new Date())
   const changeRate = previousTotal > 0
     ? Math.round(((currentTotal - previousTotal) / previousTotal) * 100)
     : null
-  const periodEvents = personEvents.filter(({ date }) => date >= days[0] && date < new Date(today.getTime() + DAY_MS))
+  const periodEvents = personEvents.filter(({ date }) => date >= days[0] && date < today)
   const recentEvents = [...personEvents].sort((a, b) => b.date - a.date)
 
   const changeText = changeRate === null
@@ -82,12 +87,13 @@ export function createHistoryAnalysis(person, sensors, events, now = new Date())
     linkedSensors,
     recentEvents,
     counts,
+    dayLabels: days.map(formatWeekday),
     maxCount: Math.max(...counts, 1),
     currentTotal,
     changeText,
     averageFirstActivity: getAverageFirstActivity(personEvents, days),
     inactivityCount: getInactivityCount(periodEvents),
-    periodLabel: `${formatShortDate(days[0])} — ${formatShortDate(today)}`,
+    periodLabel: `${formatShortDate(days[0])} — ${formatShortDate(periodEnd)}`,
     summary,
     formatTime,
   }

@@ -3,8 +3,6 @@ import { ChevronDown } from 'lucide-react'
 import { createHistoryAnalysis } from '../utils/historyAnalysis'
 import '../styles/history.css'
 
-const dayLabels = ['월', '화', '수', '목', '금', '토', '일']
-
 const getSensorLabel = (sensor, event) => sensor?.name || `센서 ${event.sensorId}`
 
 const getEventTitle = (sensor, event) => {
@@ -27,7 +25,7 @@ function PersonSelector({ people, personId, onChange }) {
   )
 }
 
-function ActivityChart({ counts, maxCount }) {
+function ActivityChart({ counts, dayLabels, maxCount }) {
   return (
     <div className="activity-chart" role="img" aria-label={`최근 7일 활동량: ${counts.join(', ')}`}>
       <div className="activity-chart__grid" aria-hidden="true">
@@ -109,7 +107,7 @@ export default function HistoryPage({ events, people, sensors }) {
               <h2>활동량 변화</h2>
               <span>{analysis.changeText}</span>
             </div>
-            <ActivityChart counts={analysis.counts} maxCount={analysis.maxCount} />
+            <ActivityChart counts={analysis.counts} dayLabels={analysis.dayLabels} maxCount={analysis.maxCount} />
           </section>
 
           <section className="analysis-section">
