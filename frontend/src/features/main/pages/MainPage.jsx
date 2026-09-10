@@ -125,8 +125,8 @@ function HomePage({ hasSensor, onAddPerson, onConnectSensor, onStartRecording, p
 function ProfilePage({ onThemeChange, theme }) {
   const [showThemeDialog, setShowThemeDialog] = useState(false)
   const themeOptions = [
-    { id: 'inverted', label: '반전 테마', description: '회색 배경 · 흰색 카드' },
-    { id: 'classic', label: '기본 테마', description: '흰색 배경 · 회색 카드' },
+    { id: 'inverted', label: '반전', description: '회색 배경 · 흰색 카드' },
+    { id: 'classic', label: '기본', description: '흰색 배경 · 회색 카드' },
   ]
 
   return (
