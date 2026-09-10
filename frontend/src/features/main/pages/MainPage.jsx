@@ -529,6 +529,17 @@ function MainPage() {
     }
 
     if (activePage === 'history') {
+      if (registeredPeople.length === 0) {
+        return (
+          <EmptyState
+            title="등록된 대상자가 없어요"
+            description="먼저 대상자를 등록해주세요."
+            actionLabel="대상자 등록하기"
+            onAction={() => setIsRegisteringPerson(true)}
+          />
+        )
+      }
+
       return <HistoryPage events={sensorEvents} people={registeredPeople} sensors={registeredSensors} />
     }
 
