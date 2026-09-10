@@ -731,13 +731,31 @@
   width: 40px;
   height: 40px;
   place-items: center;
-  border-radius: 12px;
-  color: var(--color-primary);
-  background: rgb(255 255 255 / 72%);
 }
 
 .sensor-card__icon svg {
   width: 21px;
+}
+
+.sensor-status-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+}
+
+.sensor-status-icon svg {
+  width: 21px;
+  height: 21px;
+  stroke-width: 2.25;
+}
+
+.sensor-status-icon--connecting { color: #c17a21; }
+.sensor-status-icon--unstable,
+.sensor-status-icon--disconnected { color: var(--color-error); }
+
+.sensor-status-icon--disconnected svg {
+  stroke-width: 2.8;
 }
 
 .sensor-card__heading h2 {
@@ -755,17 +773,9 @@
   white-space: nowrap;
 }
 
-.sensor-card__state {
-  position: absolute;
-  right: 21px;
-  bottom: 13px;
-  display: flex;
-  align-items: center;
-}
-
 .sensor-card__actions {
   position: relative;
-  align-self: start;
+  align-self: center;
   justify-self: end;
 }
 
@@ -832,22 +842,6 @@
   color: var(--color-error);
 }
 
-.sensor-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.sensor-status::before {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-  content: '';
-}
-
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -856,21 +850,6 @@
   clip: rect(0 0 0 0);
   clip-path: inset(50%);
   white-space: nowrap;
-}
-
-.sensor-status--normal { color: #278454; }
-.sensor-status--connecting { color: #c17a21; }
-.sensor-status--unstable { color: var(--color-error); }
-.sensor-status--disconnected { color: var(--color-error); }
-
-.sensor-status--disconnected::before {
-  width: auto;
-  height: auto;
-  background: transparent;
-  content: '×';
-  font-size: 16px;
-  font-weight: 800;
-  line-height: 1;
 }
 
 .sensor-status-guide {
@@ -892,18 +871,22 @@
   gap: 12px 18px;
 }
 
-.sensor-status-guide .sensor-status {
+.sensor-status-guide .sensor-status-icon--labeled {
+  gap: 6px;
   color: var(--color-placeholder);
+  font-size: 11px;
   font-weight: 600;
 }
 
-.sensor-status-guide .sensor-status--normal::before { background: #278454; }
-.sensor-status-guide .sensor-status--connecting::before { background: #c17a21; }
-.sensor-status-guide .sensor-status--unstable::before { background: var(--color-error); }
-.sensor-status-guide .sensor-status--disconnected::before {
-  color: var(--color-error);
-  background: transparent;
+.sensor-status-guide .sensor-status-icon--labeled svg {
+  width: 16px;
+  height: 16px;
 }
+
+.sensor-status-guide .sensor-status-icon--normal svg { color: var(--color-primary); }
+.sensor-status-guide .sensor-status-icon--connecting svg { color: #c17a21; }
+.sensor-status-guide .sensor-status-icon--unstable svg,
+.sensor-status-guide .sensor-status-icon--disconnected svg { color: var(--color-error); }
 
 .profile-view {
   padding-bottom: 18px;

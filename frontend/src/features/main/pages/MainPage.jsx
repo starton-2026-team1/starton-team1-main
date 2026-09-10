@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   UserRound,
   UsersRound,
+  X,
 } from 'lucide-react'
 import { createPerson, getPeople, updatePerson, updatePersonMonitoringStatus } from '../../../api/people'
 import { getSensorEvents } from '../../../api/sensorEvents'
@@ -265,6 +266,22 @@ const sensorStatusGuide = [
   { status: 'disconnected', label: '끊김' },
 ]
 
+function SensorStatusIcon({ status, showLabel = false }) {
+  const resolvedStatus = sensorStatusLabels[status] ? status : 'disconnected'
+  const label = sensorStatusLabels[resolvedStatus]
+  const StatusIcon = resolvedStatus === 'disconnected' ? X : Radio
+
+  return (
+    <span
+      className={`sensor-status-icon sensor-status-icon--${resolvedStatus}${showLabel ? ' sensor-status-icon--labeled' : ''}`}
+      aria-label={showLabel ? undefined : label}
+    >
+      <StatusIcon aria-hidden="true" />
+      {showLabel && <span>{label}</span>}
+    </span>
+  )
+}
+
 function SensorPage({ onAddSensor, people, sensors }) {
   const [openMenuId, setOpenMenuId] = useState(null)
 
@@ -289,7 +306,9 @@ function SensorPage({ onAddSensor, people, sensors }) {
           const person = people.find(({ id }) => id === sensor.personId)
           return (
             <article className="sensor-card" key={sensor.id}>
-              <div className="sensor-card__icon"><Radio aria-hidden="true" /></div>
+              <div className="sensor-card__icon">
+                <SensorStatusIcon status={sensor.status} />
+              </div>
               <div className="sensor-card__heading">
                 <h2>{sensor.name}</h2>
                 <p>{person?.name} · {sensor.location} · {sensor.targetObject}</p>
@@ -313,11 +332,6 @@ function SensorPage({ onAddSensor, people, sensors }) {
                   </div>
                 )}
               </div>
-              <div className="sensor-card__state" aria-label={sensorStatusLabels[sensor.status]}>
-                <span className={`sensor-status sensor-status--${sensor.status}`}>
-                  <span className="visually-hidden">{sensorStatusLabels[sensor.status]}</span>
-                </span>
-              </div>
             </article>
           )
         })}
@@ -325,8 +339,8 @@ function SensorPage({ onAddSensor, people, sensors }) {
       <section className="sensor-status-guide" aria-labelledby="sensor-status-guide-title">
         <h2 id="sensor-status-guide-title">센서 연결 상태</h2>
         <div>
-          {sensorStatusGuide.map(({ status, label }) => (
-            <span className={`sensor-status sensor-status--${status}`} key={status}>{label}</span>
+          {sensorStatusGuide.map(({ status }) => (
+            <SensorStatusIcon status={status} showLabel key={status} />
           ))}
         </div>
       </section>
