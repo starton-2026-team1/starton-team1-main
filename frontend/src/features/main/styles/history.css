@@ -200,7 +200,8 @@
   grid-template-columns: 1fr 1fr;
   margin-top: 16px;
   border-radius: 18px;
-  background: #f5f7fa;
+  background: var(--color-surface);
+  box-shadow: 0 6px 18px rgb(16 42 107 / 5%);
 }
 
 .history-metrics > div {
@@ -234,6 +235,8 @@
   border: 1px solid #dce5f3;
   border-left: 3px solid var(--color-primary);
   border-radius: 4px 16px 16px 4px;
+  background: var(--color-surface);
+  box-shadow: 0 6px 18px rgb(16 42 107 / 5%);
 }
 
 .history-ai-summary p {

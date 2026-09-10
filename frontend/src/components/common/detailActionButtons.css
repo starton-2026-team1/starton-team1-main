@@ -8,10 +8,10 @@
 .detail-action-buttons button {
   min-height: 46px;
   padding: 0 14px;
-  border: 1px solid rgb(255 255 255 / 82%);
+  border: 1px solid #e8edf5;
   border-radius: 18px;
   color: var(--color-primary);
-  background: rgb(239 241 246 / 72%);
+  background: var(--color-surface);
   box-shadow: 0 6px 18px rgb(16 42 107 / 6%);
   backdrop-filter: blur(14px);
   font: inherit;

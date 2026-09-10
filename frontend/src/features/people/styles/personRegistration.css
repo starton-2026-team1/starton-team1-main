@@ -1,7 +1,7 @@
 .person-registration-page {
   min-height: 100vh;
   min-height: 100dvh;
-  background: var(--color-surface);
+  background: var(--color-background);
 }
 
 .person-registration-panel {
@@ -9,7 +9,7 @@
   min-height: 100vh;
   min-height: 100dvh;
   padding: 20px clamp(24px, 8.5vw, 34px) 32px;
-  background: var(--color-surface);
+  background: var(--color-background);
 }
 
 .person-registration-header > div {

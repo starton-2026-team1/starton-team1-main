@@ -1,5 +1,5 @@
-.step-form-page { min-height: 100vh; min-height: 100dvh; background: var(--color-surface); }
-.step-form-panel { position: relative; width: 100%; min-height: 100vh; min-height: 100dvh; padding: 20px clamp(24px, 8.5vw, 34px) 32px; background: var(--color-surface); }
+.step-form-page { min-height: 100vh; min-height: 100dvh; background: var(--color-background); }
+.step-form-panel { position: relative; width: 100%; min-height: 100vh; min-height: 100dvh; padding: 20px clamp(24px, 8.5vw, 34px) 32px; background: var(--color-background); }
 .step-form-header { display: flex; align-items: center; justify-content: space-between; }
 .step-form-header > span { color: var(--color-placeholder); font-size: 12px; font-weight: 700; }
 .step-form-progress { height: 3px; margin-top: 16px; overflow: hidden; border-radius: 2px; background: #e7ecf5; }
