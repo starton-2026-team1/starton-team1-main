@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { ChevronRight, Phone, Radio, ShieldCheck } from 'lucide-react'
+import { ChevronRight, Phone, Radio, ShieldCheck, X } from 'lucide-react'
 import personProfileMascot from '../../../assets/mascot-profile.png'
 import alertMascot from '../../../assets/mascot/alert.png'
 import disconnectedMascot from '../../../assets/mascot/disconnected.png'
@@ -7,9 +7,30 @@ import profileMascot from '../../../assets/mascot/normal.png'
 import { createHomeDashboard } from '../utils/homeDashboard'
 import '../styles/homeDashboard.css'
 
+const sensorStatusLabels = {
+  normal: '정상',
+  connecting: '연결 중',
+  unstable: '연결 불안정',
+  disconnected: '끊김',
+}
+
+function HomeSensorStatusIcon({ status }) {
+  const resolvedStatus = sensorStatusLabels[status] ? status : 'disconnected'
+  const StatusIcon = resolvedStatus === 'disconnected' ? X : Radio
+
+  return (
+    <span
+      className={`home-sensor-status-icon home-sensor-status-icon--${resolvedStatus}`}
+      aria-label={`센서 상태: ${sensorStatusLabels[resolvedStatus]}`}
+    >
+      <StatusIcon aria-hidden="true" />
+    </span>
+  )
+}
+
 function DashboardHeader({ person, warning }) {
   return (
-    <header className="page-header home-dashboard__header">
+    <header className={`page-header home-dashboard__header${warning ? ' home-dashboard__header--warning' : ''}`}>
       <p>{warning ? '살핌이가 이상 징후를 발견했어요' : '안녕하세요!'}</p>
       <h1>{warning ? '확인이 필요한 상황이 있어요' : <>{person.name}님의 하루를<br />확인해 보세요</>}</h1>
     </header>
@@ -57,7 +78,9 @@ function ActivitySummary({ model }) {
       </section>
 
       <section className="home-recent-card" aria-labelledby="recent-record-title">
-        <div className="home-recent-card__icon"><Radio aria-hidden="true" /></div>
+        <div className="home-recent-card__icon">
+          <HomeSensorStatusIcon status={model.latestSensor?.status} />
+        </div>
         <div>
           <h2 id="recent-record-title">최근 기록</h2>
           {model.latestEvent ? (
@@ -101,7 +124,9 @@ function WarningStatus({ model }) {
       <section className="home-dashboard__section home-evidence" aria-labelledby="situation-evidence-title">
         <h2 id="situation-evidence-title">상황 근거</h2>
         <article>
-          <div className="home-evidence__icon"><Radio aria-hidden="true" /></div>
+          <div className="home-evidence__icon">
+            <HomeSensorStatusIcon status={model.warning.sensor?.status} />
+          </div>
           <div>
             <strong>{model.warning.sensor?.name || '움직임 센서'}</strong>
             <dl>
