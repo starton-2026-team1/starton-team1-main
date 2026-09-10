@@ -217,10 +217,12 @@ function PersonCard({ defaultExpanded, isUpdating, onConnectSensor, onEdit, onSt
               </dl>
             </section>
 
-            <section className="person-notes-section" aria-label={`${person.name} 건강 및 거동 참고사항`}>
-              <h3>건강·거동 참고사항</h3>
-              <p>{person.healthNotes || '등록된 참고사항이 없어요.'}</p>
-            </section>
+            {person.healthNotes?.trim() && (
+              <section className="person-notes-section" aria-label={`${person.name} 건강 및 거동 참고사항`}>
+                <h3>건강·거동 참고사항</h3>
+                <p>{person.healthNotes}</p>
+              </section>
+            )}
 
             <button className="person-sensor-link" type="button" onClick={onConnectSensor}>
               <span>연결된 센서</span>
