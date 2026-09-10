@@ -165,7 +165,7 @@ function PersonCard({ defaultExpanded, person, onConnectSensor, sensorCount }) {
         </span>
         <span className="person-summary__identity">
           <strong>{person.name}</strong>
-          <small>{person.ageGroup || '연령대 미입력'} · {person.livingSpace}</small>
+          <small>{person.ageGroup || '-'} · {person.livingSpace}</small>
         </span>
         <ChevronDown className="person-summary__chevron" aria-hidden="true" />
       </button>
@@ -175,8 +175,8 @@ function PersonCard({ defaultExpanded, person, onConnectSensor, sensorCount }) {
           <section className="person-detail-section" aria-label={`${person.name} 기본 정보`}>
             <h3>기본 정보</h3>
             <dl className="person-details">
-              <div><dt>연령대</dt><dd>{person.ageGroup || '미입력'}</dd></div>
-              <div><dt>연락처</dt><dd>{person.phone || '미입력'}</dd></div>
+              <div><dt>연령대</dt><dd>{person.ageGroup || '-'}</dd></div>
+              <div><dt>연락처</dt><dd>{person.phone || '-'}</dd></div>
               <div><dt>생활공간</dt><dd>{person.livingSpace}</dd></div>
             </dl>
           </section>
