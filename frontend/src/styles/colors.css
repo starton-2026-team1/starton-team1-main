@@ -4,7 +4,7 @@
   --color-card: #fafbfc;
   --color-card-border: #e8edf5;
   --color-navigation: rgb(232 236 243 / 82%);
-  --color-navigation-active: rgb(210 218 231 / 72%);
+  --color-navigation-active: rgb(36 107 253 / 12%);
   --color-primary: #246bfd;
   --color-primary-dark: #1554dc;
   --color-primary-soft: #5477bd;
@@ -24,5 +24,5 @@
   --color-card: rgb(239 241 246 / 72%);
   --color-card-border: rgb(255 255 255 / 82%);
   --color-navigation: rgb(255 255 255 / 92%);
-  --color-navigation-active: rgb(255 255 255 / 50%);
+  --color-navigation-active: rgb(36 107 253 / 10%);
 }

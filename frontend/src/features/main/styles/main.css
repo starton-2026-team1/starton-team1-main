@@ -1148,7 +1148,7 @@
 }
 
 .bottom-navigation__item--active {
-  color: #20a7ff;
+  color: var(--color-primary);
   background: var(--color-navigation-active);
   box-shadow: 0 3px 10px rgb(16 42 107 / 8%);
 }
