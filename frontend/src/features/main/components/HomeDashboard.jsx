@@ -32,7 +32,7 @@ function NormalStatus({ model }) {
     <section className="home-status-card home-status-card--normal" aria-labelledby="home-status-title">
       <div>
         <span>현재 상태</span>
-        <h2 id="home-status-title">정상</h2>
+        <h2 id="home-status-title">평소와 비슷해요</h2>
         <p>{model.latestEvent ? `최근 움직임이 ${model.latestElapsed}에 감지됐어요.` : '센서가 정상적으로 연결되어 있어요.'}</p>
       </div>
       <img className="home-status-card__mascot" src={profileMascot} alt="정상 상태인 살핌이" />

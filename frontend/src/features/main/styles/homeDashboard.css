@@ -21,15 +21,15 @@
 .home-dashboard__person {
   display: grid;
   width: 100%;
-  grid-template-columns: 54px minmax(0, 1fr) 18px;
+  grid-template-columns: 46px minmax(0, 1fr) 18px;
   align-items: center;
-  gap: 13px;
-  padding: 16px;
-  border: 1px solid var(--color-card-border);
+  gap: 12px;
+  padding: 11px 16px;
+  border: 1px solid #e8edf5;
   border-radius: 20px;
   color: var(--color-text);
   background: var(--color-card);
-  box-shadow: 0 6px 18px rgb(16 42 107 / 5%);
+  box-shadow: 0 8px 22px rgb(16 42 107 / 6%);
   backdrop-filter: blur(14px);
   font: inherit;
   text-align: left;
@@ -38,8 +38,8 @@
 
 .home-dashboard__avatar {
   display: grid;
-  width: 54px;
-  height: 54px;
+  width: 46px;
+  height: 46px;
   overflow: hidden;
   place-items: center;
   border-radius: 16px;
