@@ -13,6 +13,8 @@ class Sensor(Base):
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     location: Mapped[str] = mapped_column(String(50), nullable=False)
     device_id: Mapped[str] = mapped_column(String(100), nullable=False, unique=True, index=True)
+    person_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    target_object: Mapped[str] = mapped_column(String(100), nullable=False)
     status: Mapped[str] = mapped_column(String(30), nullable=False, default="DISCONNECTED")
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.current_timestamp(), nullable=False
