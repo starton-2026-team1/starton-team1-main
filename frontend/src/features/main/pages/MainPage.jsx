@@ -11,7 +11,7 @@ import {
   MoreVertical,
   Plus,
   Radio,
-  UserRound,
+  Settings,
   UsersRound,
   X,
 } from 'lucide-react'
@@ -35,7 +35,7 @@ const navigationItems = [
   { id: 'people', label: '대상자', icon: UsersRound },
   { id: 'sensor', label: '센서', icon: Activity },
   { id: 'history', label: '기록', icon: FileClock },
-  { id: 'profile', label: '내정보', icon: UserRound },
+  { id: 'profile', label: '설정', icon: Settings },
 ]
 
 const profileSections = [
@@ -132,7 +132,7 @@ function ProfilePage({ onThemeChange, theme }) {
   return (
     <div className="profile-view">
       <header className="page-header">
-        <h1>내정보</h1>
+        <h1>설정</h1>
       </header>
 
       <section className="profile-card" aria-label="사용자 정보">

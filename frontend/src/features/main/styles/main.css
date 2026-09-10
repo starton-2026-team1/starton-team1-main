@@ -968,7 +968,7 @@
 .settings-list button {
   display: grid;
   width: 100%;
-  min-height: 56px;
+  min-height: 50px;
   grid-template-columns: minmax(0, 1fr) 18px;
   align-items: center;
   gap: 12px;
