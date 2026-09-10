@@ -21,7 +21,10 @@
 }
 
 .detail-action-buttons .detail-action-buttons__secondary {
-  color: var(--color-error);
+  border-color: var(--color-card-border);
+  color: var(--color-placeholder);
+  background: var(--color-card);
+  box-shadow: 0 6px 18px rgb(16 42 107 / 6%);
 }
 
 .detail-action-buttons button:disabled {
