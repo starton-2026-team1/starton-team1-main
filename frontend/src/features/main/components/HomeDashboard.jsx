@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { ChevronRight, Phone, Radio, ShieldCheck } from 'lucide-react'
 import personProfileMascot from '../../../assets/mascot-profile.png'
 import alertMascot from '../../../assets/mascot/alert.png'
+import disconnectedMascot from '../../../assets/mascot/disconnected.png'
 import profileMascot from '../../../assets/mascot/normal.png'
 import { createHomeDashboard } from '../utils/homeDashboard'
 import '../styles/homeDashboard.css'
@@ -69,6 +70,7 @@ function ActivitySummary({ model }) {
 }
 
 function WarningStatus({ model }) {
+  const isSensorDisconnected = model.warning.sensor?.status === 'disconnected'
   const callTarget = () => {
     if (model.person.phone) window.location.href = `tel:${model.person.phone}`
   }
@@ -80,7 +82,11 @@ function WarningStatus({ model }) {
           <h2 id="home-warning-title">{model.warning.title}</h2>
           <p>{model.warning.description}<br />{model.warning.connectionMessage}</p>
         </div>
-        <img className="home-status-card__mascot" src={alertMascot} alt="주의 상황을 알리는 살핌이" />
+        <img
+          className="home-status-card__mascot"
+          src={isSensorDisconnected ? disconnectedMascot : alertMascot}
+          alt={isSensorDisconnected ? '센서 연결 끊김을 알리는 살핌이' : '주의 상황을 알리는 살핌이'}
+        />
       </section>
 
       <div className="home-warning-actions">
