@@ -12,38 +12,48 @@ const formatTime = (date) => new Intl.DateTimeFormat('ko-KR', {
   hour12: false,
 }).format(date)
 
-const formatElapsed = (date) => {
-  const minutes = Math.max(0, Math.floor((Date.now() - date.getTime()) / 60000))
+const formatElapsed = (date, now) => {
+  const elapsedMilliseconds = now.getTime() - date.getTime()
+  const isFuture = elapsedMilliseconds < -60_000
+  const minutes = Math.floor(Math.abs(elapsedMilliseconds) / 60000)
   if (minutes < 1) return '방금 전'
-  if (minutes < 60) return `${minutes}분 전`
+  const suffix = isFuture ? '후' : '전'
+  if (minutes < 60) return `${minutes}분 ${suffix}`
   const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours}시간 전`
-  return `${Math.floor(hours / 24)}일 전`
+  if (hours < 24) return `${hours}시간 ${suffix}`
+  return `${Math.floor(hours / 24)}일 ${suffix}`
 }
 
-export function createHomeDashboard(person, sensors, events) {
+const isToday = (date, now) => date
+  && date.getTime() <= now.getTime()
+  && date.getFullYear() === now.getFullYear()
+  && date.getMonth() === now.getMonth()
+  && date.getDate() === now.getDate()
+
+export function createHomeDashboard(person, sensors, events, now = new Date()) {
   const linkedSensors = sensors.filter(({ personId }) => personId === person.id)
   const linkedSensorIds = new Set(linkedSensors.map(({ id }) => id))
   const linkedEvents = events
     .filter((event) => event.personId === person.id || linkedSensorIds.has(event.sensorId))
     .sort((a, b) => (toDate(b.detectedAt)?.getTime() || 0) - (toDate(a.detectedAt)?.getTime() || 0))
+  const todayEvents = linkedEvents.filter((event) => isToday(toDate(event.detectedAt), now))
   const latestEvent = linkedEvents[0]
   const latestDate = toDate(latestEvent?.detectedAt)
   const latestSensor = linkedSensors.find(({ id }) => id === latestEvent?.sensorId) || linkedSensors[0]
   const disconnectedSensor = linkedSensors.find(({ status }) => status === 'disconnected')
   const warningStatus = warningStatuses.has(latestEvent?.sensorStatus?.toUpperCase())
-  const inactiveMinutes = latestDate ? Math.max(0, Math.floor((Date.now() - latestDate.getTime()) / 60000)) : 0
+  const inactiveMinutes = latestDate ? Math.max(0, Math.floor((now.getTime() - latestDate.getTime()) / 60000)) : 0
   const inactiveTooLong = Boolean(latestDate) && inactiveMinutes >= inactivityLimitMinutes
   const isWarning = Boolean(disconnectedSensor || warningStatus || inactiveTooLong)
 
   return {
     person,
     sensors: linkedSensors,
-    events: linkedEvents,
+    events: todayEvents,
     latestEvent,
     latestSensor,
     latestTime: latestDate ? formatTime(latestDate) : '--:--',
-    latestElapsed: latestDate ? formatElapsed(latestDate) : '기록 없음',
+    latestElapsed: latestDate ? formatElapsed(latestDate, now) : '기록 없음',
     isWarning,
     warning: isWarning ? {
       sensor: disconnectedSensor || latestSensor,

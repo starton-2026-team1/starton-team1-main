@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { ChevronRight, Phone, Radio } from 'lucide-react'
 import personProfileMascot from '../../../assets/mascot-profile.png'
 import alertMascot from '../../../assets/mascot/alert.png'
@@ -108,7 +109,22 @@ function WarningStatus({ model, onOpenHistory }) {
 }
 
 export default function HomeDashboard({ events, onOpenHistory, onOpenPerson, person, sensors }) {
-  const dashboard = createHomeDashboard(person, sensors, events)
+  const [now, setNow] = useState(() => new Date())
+
+  useEffect(() => {
+    const updateCurrentTime = () => setNow(new Date())
+    const timer = window.setInterval(updateCurrentTime, 30_000)
+    window.addEventListener('focus', updateCurrentTime)
+    document.addEventListener('visibilitychange', updateCurrentTime)
+
+    return () => {
+      window.clearInterval(timer)
+      window.removeEventListener('focus', updateCurrentTime)
+      document.removeEventListener('visibilitychange', updateCurrentTime)
+    }
+  }, [])
+
+  const dashboard = createHomeDashboard(person, sensors, events, now)
   const previewStatus = import.meta.env.DEV
     ? new URLSearchParams(window.location.search).get('preview')
     : null
