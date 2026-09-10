@@ -64,6 +64,14 @@ export async function disconnectSensor(sensorId) {
   return toSensor(updated)
 }
 
+export async function connectSensor(sensorId) {
+  const updated = await apiRequest(`/sensors/${sensorId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status: 'CONNECTED' }),
+  })
+  return toSensor(updated)
+}
+
 export async function deleteSensor(sensorId) {
   await apiRequest(`/sensors/${sensorId}`, { method: 'DELETE' })
 }

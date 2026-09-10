@@ -17,7 +17,7 @@ import {
 } from 'lucide-react'
 import { createPerson, deletePerson, getPeople, updatePerson, updatePersonMonitoringStatus } from '../../../api/people'
 import { getSensorEvents } from '../../../api/sensorEvents'
-import { createSensor, deleteSensor, disconnectSensor, getSensors, updateSensor } from '../../../api/sensors'
+import { connectSensor, createSensor, deleteSensor, disconnectSensor, getSensors, updateSensor } from '../../../api/sensors'
 import mascot from '../../../assets/mascot.png'
 import personProfileMascot from '../../../assets/mascot-profile.png'
 import emptyMascot from '../../../assets/mascot/empty.png'
@@ -310,7 +310,7 @@ function SensorStatusIcon({ status, showLabel = false }) {
   )
 }
 
-function SensorPage({ disconnectingSensorId, onAddSensor, onDeleteSensor, onDisconnectSensor, onEditSensor, people, sensors }) {
+function SensorPage({ onAddSensor, onDeleteSensor, onEditSensor, onToggleConnection, people, sensors, updatingConnectionSensorId }) {
   const [openMenuId, setOpenMenuId] = useState(null)
 
   const closeMenu = (event) => {
@@ -365,12 +365,14 @@ function SensorPage({ disconnectingSensorId, onAddSensor, onDeleteSensor, onDisc
                     <button
                       type="button"
                       role="menuitem"
-                      disabled={disconnectingSensorId === sensor.id || sensor.status === 'disconnected'}
+                      disabled={updatingConnectionSensorId === sensor.id}
                       onClick={() => {
                         setOpenMenuId(null)
-                        onDisconnectSensor(sensor)
+                        onToggleConnection(sensor)
                       }}
-                    >{disconnectingSensorId === sensor.id ? '연결 해제 중...' : '연결 해제'}</button>
+                    >{updatingConnectionSensorId === sensor.id
+                      ? sensor.status === 'disconnected' ? '연결 중...' : '연결 해제 중...'
+                      : sensor.status === 'disconnected' ? '다시 연결' : '연결 해제'}</button>
                     <button
                       className="sensor-card__menu-danger"
                       type="button"
@@ -413,7 +415,7 @@ function MainPage() {
   const [sensorEvents, setSensorEvents] = useState([])
   const [sensorToDelete, setSensorToDelete] = useState(null)
   const [isDeletingSensor, setIsDeletingSensor] = useState(false)
-  const [disconnectingSensorId, setDisconnectingSensorId] = useState(null)
+  const [updatingConnectionSensorId, setUpdatingConnectionSensorId] = useState(null)
   const [personToStopMonitoring, setPersonToStopMonitoring] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [apiError, setApiError] = useState('')
@@ -495,17 +497,19 @@ function MainPage() {
     }
   }
 
-  const disconnectRegisteredSensor = async (sensor) => {
-    setDisconnectingSensorId(sensor.id)
+  const toggleSensorConnection = async (sensor) => {
+    setUpdatingConnectionSensorId(sensor.id)
     try {
-      const updated = await disconnectSensor(sensor.id)
+      const updated = sensor.status === 'disconnected'
+        ? await connectSensor(sensor.id)
+        : await disconnectSensor(sensor.id)
       setRegisteredSensors((sensors) => sensors.map((item) => (
         item.id === updated.id ? updated : item
       )))
     } catch (error) {
-      setApiError(error.message || '센서 연결을 해제하지 못했어요.')
+      setApiError(error.message || `센서를 ${sensor.status === 'disconnected' ? '다시 연결' : '연결 해제'}하지 못했어요.`)
     } finally {
-      setDisconnectingSensorId(null)
+      setUpdatingConnectionSensorId(null)
     }
   }
 
@@ -569,13 +573,13 @@ function MainPage() {
       if (registeredSensors.length > 0) {
         return (
           <SensorPage
-            disconnectingSensorId={disconnectingSensorId}
             sensors={registeredSensors}
             people={registeredPeople}
             onAddSensor={() => setIsRegisteringSensor(true)}
             onDeleteSensor={setSensorToDelete}
-            onDisconnectSensor={disconnectRegisteredSensor}
             onEditSensor={setEditingSensor}
+            onToggleConnection={toggleSensorConnection}
+            updatingConnectionSensorId={updatingConnectionSensorId}
           />
         )
       }
