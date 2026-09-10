@@ -9,8 +9,14 @@
 .step-form-question { margin: 0 0 28px; color: var(--color-text); font-size: 25px; font-weight: 800; line-height: 1.35; letter-spacing: -0.9px; word-break: keep-all; }
 .step-form-description { margin: -18px 0 26px; color: var(--color-placeholder); font-size: 13px; line-height: 1.55; word-break: keep-all; }
 .step-form .underlined-input input { font-size: 19px; }
-.step-form-action { position: absolute; right: 0; bottom: 0; left: 0; width: 100%; min-height: 56px; border: 0; border-radius: 28px; color: #fff; background: var(--color-primary); box-shadow: 0 8px 20px rgb(36 107 253 / 20%); font: inherit; font-size: 17px; font-weight: 700; cursor: pointer; }
+.step-form-actions { position: absolute; right: 0; bottom: 0; left: 0; display: grid; }
+.step-form-actions--split { grid-template-columns: minmax(112px, .72fr) 1fr; gap: 10px; }
+.step-form-action,
+.step-form-secondary-action { min-height: 56px; border-radius: 28px; font: inherit; font-size: 16px; font-weight: 700; cursor: pointer; }
+.step-form-action { border: 0; color: #fff; background: var(--color-primary); box-shadow: 0 8px 20px rgb(36 107 253 / 20%); }
+.step-form-secondary-action { border: 1px solid var(--color-error); color: var(--color-error); background: #fff; }
 .step-form-action:disabled { opacity: .45; cursor: default; }
+.step-form-secondary-action:disabled { opacity: .45; cursor: wait; }
 .step-form-server-error { margin: 16px 0 0; color: #e14d57; font-size: 13px; }
 @media (max-height: 650px) { .step-form-content { top: 38%; } }
 @media (min-width: 601px) { .step-form-panel { max-width: 402px; margin-inline: auto; box-shadow: 0 0 40px rgb(16 42 107 / 8%); } }

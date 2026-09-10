@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react'
 import {
   Activity,
-  Bell,
   ChevronDown,
   ChevronRight,
-  CircleHelp,
   FileClock,
   Home,
   Info,
@@ -12,13 +10,11 @@ import {
   MoreVertical,
   Plus,
   Radio,
-  Settings,
-  ShieldCheck,
   UserRound,
   UsersRound,
   X,
 } from 'lucide-react'
-import { createPerson, getPeople, updatePerson, updatePersonMonitoringStatus } from '../../../api/people'
+import { createPerson, deletePerson, getPeople, updatePerson, updatePersonMonitoringStatus } from '../../../api/people'
 import { getSensorEvents } from '../../../api/sensorEvents'
 import { createSensor, deleteSensor, getSensors } from '../../../api/sensors'
 import mascot from '../../../assets/mascot.png'
@@ -41,13 +37,11 @@ const navigationItems = [
   { id: 'profile', label: '내정보', icon: UserRound },
 ]
 
-const profileItems = [
-  { label: '내 프로필', icon: UserRound },
-  { label: '알림 설정', icon: Bell },
-  { label: '보호자 및 가족 관리', icon: UsersRound },
-  { label: '앱 권한 설정', icon: Settings },
-  { label: '고객센터', icon: CircleHelp },
-  { label: '이용약관 및 개인정보 처리방침', icon: ShieldCheck },
+const profileSections = [
+  { title: '계정', items: ['내 정보 수정'] },
+  { title: '환경설정', items: ['알림 설정', '접근성 설정'] },
+  { title: '기기 및 안전', items: ['안심태그(NFC)'] },
+  { title: '지원', items: ['도움말', '이용약관 및 개인정보 처리방침'] },
 ]
 
 function EmptyState({ actionLabel, description, onAction, title }) {
@@ -135,20 +129,26 @@ function ProfilePage() {
       </header>
 
       <section className="profile-card" aria-label="사용자 정보">
-        <div className="profile-card__avatar"><UserRound aria-hidden="true" /></div>
-        <div><strong>사용자</strong><span>계정 정보를 확인해 주세요</span></div>
+        <div className="profile-card__avatar"><img src={mascot} alt="" /></div>
+        <div><strong>사용자</strong><span>이메일</span></div>
         <ChevronRight aria-hidden="true" />
       </section>
 
-      <section className="settings-list" aria-label="설정">
-        {profileItems.map(({ label, icon: Icon }) => (
-          <button key={label} type="button">
-            <Icon aria-hidden="true" />
-            <span>{label}</span>
-            <ChevronRight aria-hidden="true" />
-          </button>
+      <div className="settings-sections">
+        {profileSections.map(({ title, items }) => (
+          <section className="settings-section" aria-labelledby={`settings-${title}`} key={title}>
+            <h2 id={`settings-${title}`}>{title}</h2>
+            <div className="settings-list">
+              {items.map((label) => (
+                <button key={label} type="button">
+                  <span>{label}</span>
+                  <ChevronRight aria-hidden="true" />
+                </button>
+              ))}
+            </div>
+          </section>
         ))}
-      </section>
+      </div>
 
       <button className="logout-button" type="button">
         <LogOut aria-hidden="true" />
@@ -204,7 +204,7 @@ function PersonCard({ defaultExpanded, isUpdating, onConnectSensor, onEdit, onSt
             </button>
           </div>
           <DetailActionButtons
-            primaryLabel="정보수정"
+            primaryLabel="정보수정/삭제"
             onPrimary={onEdit}
             secondaryLabel={isUpdating ? '중지 중...' : '모니터링 중지'}
             onSecondary={onStopMonitoring}
@@ -566,6 +566,14 @@ function MainPage() {
       <PersonRegistrationPage
         initialPerson={editingPerson}
         onBack={() => setEditingPerson(null)}
+        onDelete={async () => {
+          await deletePerson(editingPerson.id)
+          setRegisteredPeople((people) => people.filter(({ id }) => id !== editingPerson.id))
+          setRegisteredSensors((sensors) => sensors.filter(({ personId }) => personId !== editingPerson.id))
+          setSensorEvents((events) => events.filter(({ personId }) => personId !== editingPerson.id))
+          setEditingPerson(null)
+          setActivePage('people')
+        }}
         onRegister={async (person) => {
           const updated = await updatePerson(editingPerson.id, person)
           setRegisteredPeople((people) => people.map((item) => (

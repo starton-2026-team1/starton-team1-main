@@ -51,3 +51,7 @@ export async function updatePerson(personId, person) {
   })
   return toPerson(updated)
 }
+
+export async function deletePerson(personId) {
+  await apiRequest(`/people/${personId}`, { method: 'DELETE' })
+}

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Check } from 'lucide-react'
 import StepFormLayout from '../../../components/common/StepFormLayout'
 import UnderlinedInput from '../../../components/common/UnderlinedInput'
+import ConfirmDialog from '../../../components/common/ConfirmDialog'
 import '../../auth/styles/login.css'
 import '../styles/personRegistration.css'
 
@@ -16,13 +17,15 @@ const steps = [
 const ageGroups = ['60대 이하', '70대', '80대', '90대 이상']
 const initialForm = { name: '', ageGroup: '', phone: '', livingSpace: '', healthNotes: '' }
 
-function PersonRegistrationPage({ initialPerson, onBack, onRegister }) {
+function PersonRegistrationPage({ initialPerson, onBack, onDelete, onRegister }) {
   const [form, setForm] = useState(() => initialPerson
     ? { ...initialForm, ...initialPerson }
     : initialForm)
   const [step, setStep] = useState(0)
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
   const current = steps[step]
 
   const update = (field, value) => {
@@ -80,13 +83,37 @@ function PersonRegistrationPage({ initialPerson, onBack, onRegister }) {
 
   const isOptionalStep = ['ageGroup', 'phone', 'healthNotes'].includes(current.field)
 
+  const handleDelete = async () => {
+    setIsDeleting(true)
+    try {
+      await onDelete?.()
+    } catch (deleteError) {
+      setError(deleteError.message || '대상자를 삭제하지 못했어요.')
+      setShowDeleteConfirm(false)
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
   return (
-    <StepFormLayout ariaLabel={`대상자 정보 ${initialPerson ? '수정' : '등록'}`} currentStep={step} totalSteps={steps.length} onBack={handleBack} onSubmit={handleSubmit} actionDisabled={isSubmitting} actionLabel={isSubmitting ? `${initialPerson ? '수정' : '등록'} 중...` : step === steps.length - 1 ? `${initialPerson ? '수정' : '등록'}하기` : isOptionalStep && !form[current.field] ? '건너뛰기' : '다음'}>
-      <h1 className="step-form-question">{current.question}</h1>
-      <p className="step-form-description">{current.description}</p>
-      {renderInput()}
-      {error && ['ageGroup', 'healthNotes'].includes(current.field) && <p className="step-form-server-error" role="alert">{error}</p>}
-    </StepFormLayout>
+    <>
+      <StepFormLayout ariaLabel={`대상자 정보 ${initialPerson ? '수정 및 삭제' : '등록'}`} currentStep={step} totalSteps={steps.length} onBack={handleBack} onSubmit={handleSubmit} actionDisabled={isSubmitting || isDeleting} actionLabel={isSubmitting ? `${initialPerson ? '수정' : '등록'} 중...` : step === steps.length - 1 ? `${initialPerson ? '수정' : '등록'}하기` : isOptionalStep && !form[current.field] ? '건너뛰기' : '다음'} secondaryActionLabel={initialPerson && step === 0 ? '삭제' : undefined} secondaryActionDisabled={isSubmitting || isDeleting} onSecondaryAction={() => setShowDeleteConfirm(true)}>
+        <h1 className="step-form-question">{current.question}</h1>
+        <p className="step-form-description">{current.description}</p>
+        {renderInput()}
+        {error && ['ageGroup', 'healthNotes'].includes(current.field) && <p className="step-form-server-error" role="alert">{error}</p>}
+      </StepFormLayout>
+      {showDeleteConfirm && (
+        <ConfirmDialog
+          title={`${initialPerson.name} 대상자를 삭제할까요?`}
+          description={<>연결된 센서와 기록도 함께 삭제되며,<br />삭제한 정보는 복구할 수 없어요.</>}
+          confirmLabel="삭제"
+          isConfirming={isDeleting}
+          onCancel={() => setShowDeleteConfirm(false)}
+          onConfirm={handleDelete}
+        />
+      )}
+    </>
   )
 }
 
