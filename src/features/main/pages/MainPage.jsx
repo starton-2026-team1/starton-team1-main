@@ -2,6 +2,7 @@ import { useState } from 'react'
 import {
   Activity,
   Bell,
+  ChevronDown,
   ChevronRight,
   CircleHelp,
   FileClock,
@@ -9,6 +10,7 @@ import {
   Info,
   LogOut,
   Plus,
+  Radio,
   Settings,
   ShieldCheck,
   UserRound,
@@ -16,6 +18,9 @@ import {
 } from 'lucide-react'
 import mascot from '../../../assets/mascot.png'
 import emptyMascot from '../../../assets/mascot/empty.png'
+import profileMascot from '../../../assets/mascot/normal.png'
+import PersonRegistrationPage from '../../people/pages/PersonRegistrationPage'
+import SensorRegistrationPage from '../../sensor/pages/SensorRegistrationPage'
 import '../styles/main.css'
 
 const navigationItems = [
@@ -42,7 +47,7 @@ function EmptyState({ actionLabel, description, onAction, title }) {
         <img src={emptyMascot} alt="기다리고 있는 캐릭터" />
       </div>
       <h2>{title}</h2>
-      <p>{description}</p>
+      {description && <p>{description}</p>}
       {actionLabel && (
         <button className="primary-action" type="button" onClick={onAction}>
           <Plus aria-hidden="true" />
@@ -53,42 +58,58 @@ function EmptyState({ actionLabel, description, onAction, title }) {
   )
 }
 
-function HomePage({ onAddPerson }) {
+function HomePage({ hasSensor, onAddPerson, onConnectSensor, onStartRecording, person }) {
+  const hasPerson = Boolean(person)
+
   return (
     <div className="home-view">
       <header className="page-header home-view__header">
         <p>안녕하세요!</p>
-        <h1>안심 모니터링을<br />시작해 볼까요?</h1>
+        <h1>
+          {hasSensor ? `${person.name}님의 오늘을` : hasPerson ? `${person.name}님의 모니터링을` : '안심 모니터링을'}
+          <br />
+          {hasSensor ? '확인해 볼까요?' : hasPerson ? '준비해 볼까요?' : '시작해 볼까요?'}
+        </h1>
       </header>
 
       <section className="onboarding-card" aria-labelledby="onboarding-title">
         <div className="onboarding-card__illustration">
           <img src={mascot} alt="손을 흔드는 살핌이 캐릭터" />
         </div>
-        <h2 id="onboarding-title">먼저 대상자를 등록해 주세요</h2>
+        <h2 id="onboarding-title">
+          {hasSensor ? '모니터링 준비가 완료됐어요' : hasPerson ? '이제 센서를 연결해 주세요' : '먼저 대상자를 등록해 주세요'}
+        </h2>
         <p className="onboarding-card__description">
-          가족을 등록한 다음 센서를 연결할 수 있어요.
+          {hasSensor
+            ? '센서 기록과 이상 징후를 확인할 수 있어요.'
+            : hasPerson
+            ? '생활공간에 센서를 연결하면 모니터링을 시작할 수 있어요.'
+            : '가족을 등록한 다음 센서를 연결할 수 있어요.'}
         </p>
 
         <ol className="onboarding-progress" aria-label="모니터링 시작 단계">
-          <li className="onboarding-progress__item onboarding-progress__item--active">
+          <li className={`onboarding-progress__item${hasPerson ? ' onboarding-progress__item--complete' : ' onboarding-progress__item--active'}`}>
             <span>1</span>
             <strong>대상자 등록</strong>
           </li>
-          <li className="onboarding-progress__line" aria-hidden="true" />
-          <li className="onboarding-progress__item">
+          <li className={`onboarding-progress__line${hasPerson ? ' onboarding-progress__line--complete' : ''}`} aria-hidden="true" />
+          <li className={`onboarding-progress__item${hasSensor ? ' onboarding-progress__item--complete' : hasPerson ? ' onboarding-progress__item--active' : ''}`}>
             <span>2</span>
             <strong>센서 연결</strong>
           </li>
-          <li className="onboarding-progress__line" aria-hidden="true" />
-          <li className="onboarding-progress__item">
+          <li className={`onboarding-progress__line${hasSensor ? ' onboarding-progress__line--complete' : ''}`} aria-hidden="true" />
+          <li className={`onboarding-progress__item${hasSensor ? ' onboarding-progress__item--active' : ''}`}>
             <span>3</span>
             <strong>준비 완료</strong>
           </li>
         </ol>
 
-        <button className="primary-action primary-action--wide" type="button" onClick={onAddPerson}>
-          대상자 등록하기
+        <button
+          className="primary-action primary-action--wide"
+          type="button"
+          onClick={hasSensor ? onStartRecording : hasPerson ? onConnectSensor : onAddPerson}
+        >
+          {hasSensor ? '기록 시작하기' : hasPerson ? '센서 연결하기' : '대상자 등록하기'}
           <ChevronRight aria-hidden="true" />
         </button>
       </section>
@@ -128,26 +149,191 @@ function ProfilePage() {
   )
 }
 
+function PersonCard({ defaultExpanded, person, onConnectSensor, sensorCount }) {
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded)
+
+  return (
+    <article className={`person-accordion${isExpanded ? ' person-accordion--expanded' : ''}`}>
+      <button
+        className="person-summary"
+        type="button"
+        aria-expanded={isExpanded}
+        onClick={() => setIsExpanded((expanded) => !expanded)}
+      >
+        <span className="person-summary__avatar">
+          <img src={profileMascot} alt="" />
+        </span>
+        <span className="person-summary__identity">
+          <strong>{person.name}</strong>
+          <small>{person.ageGroup || '연령대 미입력'} · {person.livingSpace}</small>
+        </span>
+        <ChevronDown className="person-summary__chevron" aria-hidden="true" />
+      </button>
+
+      {isExpanded && (
+        <div className="person-accordion__content">
+          <section className="person-detail-section" aria-label={`${person.name} 기본 정보`}>
+            <h3>기본 정보</h3>
+            <dl className="person-details">
+              <div><dt>연령대</dt><dd>{person.ageGroup || '미입력'}</dd></div>
+              <div><dt>연락처</dt><dd>{person.phone || '미입력'}</dd></div>
+              <div><dt>생활공간</dt><dd>{person.livingSpace}</dd></div>
+            </dl>
+          </section>
+
+          <section className="person-notes-section" aria-label={`${person.name} 건강 및 거동 참고사항`}>
+            <h3>건강·거동 참고사항</h3>
+            <p>{person.healthNotes || '등록된 참고사항이 없어요.'}</p>
+          </section>
+
+          <button className="person-sensor-link" type="button" onClick={onConnectSensor}>
+            <span>연결된 센서</span>
+            <strong>{sensorCount > 0 ? `${sensorCount}개` : '연결하기'}</strong>
+            <ChevronRight aria-hidden="true" />
+          </button>
+        </div>
+      )}
+    </article>
+  )
+}
+
+function PeoplePage({ people, onAddPerson, onConnectSensor, sensors }) {
+  return (
+    <div className="people-view">
+      <header className="page-header people-view__header">
+        <h1>대상자</h1>
+        <button type="button" aria-label="대상자 추가" onClick={onAddPerson}>
+          <Plus aria-hidden="true" />
+        </button>
+      </header>
+
+      <div className="people-list">
+        {people.map((person, index) => (
+          <PersonCard
+            key={person.id}
+            person={person}
+            defaultExpanded={index === 0}
+            onConnectSensor={onConnectSensor}
+            sensorCount={sensors.filter(({ personId }) => personId === person.id).length}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+const sensorStatusLabels = {
+  normal: '정상',
+  connecting: '연결 중',
+  disconnected: '연결 끊김',
+}
+
+function SensorPage({ onAddSensor, people, sensors }) {
+  return (
+    <div className="sensors-view">
+      <header className="page-header sensors-view__header">
+        <div>
+          <h1>센서</h1>
+          <p>연결된 센서 {sensors.length}개</p>
+        </div>
+        <button type="button" aria-label="센서 추가" onClick={onAddSensor}>
+          <Plus aria-hidden="true" />
+        </button>
+      </header>
+
+      <div className="sensor-list">
+        {sensors.map((sensor) => {
+          const person = people.find(({ id }) => id === sensor.personId)
+          return (
+            <article className="sensor-card" key={sensor.id}>
+              <div className="sensor-card__icon"><Radio aria-hidden="true" /></div>
+              <div className="sensor-card__heading">
+                <h2>{sensor.name}</h2>
+                <p>{person?.name} · {sensor.location} · {sensor.targetObject}</p>
+              </div>
+              <div className="sensor-card__state">
+                <span className={`sensor-status sensor-status--${sensor.status}`}>
+                  <span className="visually-hidden">{sensorStatusLabels[sensor.status]}</span>
+                </span>
+              </div>
+            </article>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 function MainPage() {
   const [activePage, setActivePage] = useState('home')
+  const [isRegisteringPerson, setIsRegisteringPerson] = useState(false)
+  const [isRegisteringSensor, setIsRegisteringSensor] = useState(false)
+  const [isRecordingStarted, setIsRecordingStarted] = useState(false)
+  const [registeredPeople, setRegisteredPeople] = useState([])
+  const [registeredSensors, setRegisteredSensors] = useState([])
   const activeItem = navigationItems.find(({ id }) => id === activePage)
 
   const renderPage = () => {
     if (activePage === 'home') {
-      return <HomePage onAddPerson={() => setActivePage('people')} />
+      if (isRecordingStarted) {
+        return <div className="recording-home" aria-label="기록 중 홈" />
+      }
+
+      return (
+        <HomePage
+          person={registeredPeople[0]}
+          hasSensor={registeredSensors.length > 0}
+          onAddPerson={() => setIsRegisteringPerson(true)}
+          onConnectSensor={() => setActivePage('sensor')}
+          onStartRecording={() => setIsRecordingStarted(true)}
+        />
+      )
     }
 
     if (activePage === 'people') {
+      if (registeredPeople.length > 0) {
+        return (
+          <PeoplePage
+            people={registeredPeople}
+            sensors={registeredSensors}
+            onAddPerson={() => setIsRegisteringPerson(true)}
+            onConnectSensor={() => setActivePage('sensor')}
+          />
+        )
+      }
+
       return (
         <EmptyState
           title="등록된 대상자가 없어요"
           description="돌봄이 필요한 가족을 등록해 주세요."
           actionLabel="대상자 등록하기"
+          onAction={() => setIsRegisteringPerson(true)}
         />
       )
     }
 
     if (activePage === 'sensor') {
+      if (registeredSensors.length > 0) {
+        return (
+          <SensorPage
+            sensors={registeredSensors}
+            people={registeredPeople}
+            onAddSensor={() => setIsRegisteringSensor(true)}
+          />
+        )
+      }
+
+      if (registeredPeople.length > 0) {
+        return (
+          <EmptyState
+            title="연결된 센서가 없어요"
+            description={`${registeredPeople[0].name}님의 생활공간에 센서를 연결해 주세요.`}
+            actionLabel="센서 연결하기"
+            onAction={() => setIsRegisteringSensor(true)}
+          />
+        )
+      }
+
       return (
         <EmptyState
           title="먼저 대상자를 등록해 주세요"
@@ -162,12 +348,45 @@ function MainPage() {
       return (
         <EmptyState
           title="아직 기록이 없어요"
-          description="센서를 연결하면 활동과 알림 기록이 쌓여요."
+          description={registeredSensors.length > 0 ? '' : '센서를 연결하면 활동과 알림 기록이 쌓여요.'}
         />
       )
     }
 
     return <ProfilePage />
+  }
+
+  if (isRegisteringPerson) {
+    return (
+      <PersonRegistrationPage
+        onBack={() => setIsRegisteringPerson(false)}
+        onRegister={(person) => {
+          setRegisteredPeople((people) => [
+            ...people,
+            { ...person, id: crypto.randomUUID() },
+          ])
+          setActivePage('people')
+          setIsRegisteringPerson(false)
+        }}
+      />
+    )
+  }
+
+  if (isRegisteringSensor) {
+    return (
+      <SensorRegistrationPage
+        people={registeredPeople}
+        onBack={() => setIsRegisteringSensor(false)}
+        onRegister={(sensor) => {
+          setRegisteredSensors((sensors) => [
+            ...sensors,
+            { ...sensor, id: crypto.randomUUID() },
+          ])
+          setActivePage('sensor')
+          setIsRegisteringSensor(false)
+        }}
+      />
+    )
   }
 
   return (
