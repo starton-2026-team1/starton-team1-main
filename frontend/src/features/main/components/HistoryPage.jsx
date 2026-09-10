@@ -61,7 +61,7 @@ function EventRows({ events, sensors, limit, showEmpty = true }) {
             <time dateTime={event.detectedAt}>{event.date ? new Intl.DateTimeFormat('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false }).format(event.date) : '--:--'}</time>
             <div>
               <strong>{getEventTitle(sensor, event)}</strong>
-              <span>{sensor?.location || getSensorLabel(sensor, event)} · {event.sensorStatus?.toUpperCase() === 'DISCONNECTED' ? '연결 끊김' : '정상'}</span>
+              <span>{sensor?.location || getSensorLabel(sensor, event)}</span>
             </div>
           </article>
         )
