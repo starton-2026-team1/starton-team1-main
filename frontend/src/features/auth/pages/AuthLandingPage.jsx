@@ -1,4 +1,4 @@
-import mascot from '../../../assets/mascot.png'
+import mascot from '../../../assets/heart-ultrasound-mascot.png'
 import '../styles/authLanding.css'
 
 function AuthLandingPage({ onEmailLogin, onSignUp, onGoHome }) {
@@ -19,7 +19,11 @@ function AuthLandingPage({ onEmailLogin, onSignUp, onGoHome }) {
         </header>
 
         <div className="auth-landing__mascot-wrap">
-          <img className="auth-landing__mascot" src={mascot} alt="손을 흔드는 살핌이 캐릭터" />
+          <img
+            className="auth-landing__mascot"
+            src={mascot}
+            alt="머리 위로 핑크색 하트 초음파 신호를 보내는 파란색 살핌이 캐릭터"
+          />
         </div>
 
         <div className="auth-landing__sheet">
