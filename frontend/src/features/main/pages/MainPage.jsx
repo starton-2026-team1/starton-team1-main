@@ -21,8 +21,8 @@ import { createPerson, getPeople, updatePerson, updatePersonMonitoringStatus } f
 import { getSensorEvents } from '../../../api/sensorEvents'
 import { createSensor, getSensors } from '../../../api/sensors'
 import mascot from '../../../assets/mascot.png'
+import personProfileMascot from '../../../assets/mascot-profile.png'
 import emptyMascot from '../../../assets/mascot/empty.png'
-import profileMascot from '../../../assets/mascot/normal.png'
 import NoticeToast from '../../../components/common/NoticeToast'
 import DetailActionButtons from '../../../components/common/DetailActionButtons'
 import PersonRegistrationPage from '../../people/pages/PersonRegistrationPage'
@@ -169,7 +169,7 @@ function PersonCard({ defaultExpanded, isUpdating, onConnectSensor, onEdit, onSt
         onClick={() => setIsExpanded((expanded) => !expanded)}
       >
         <span className="person-summary__avatar">
-          <img src={profileMascot} alt="" />
+          <img src={personProfileMascot} alt="" />
         </span>
         <span className="person-summary__identity">
           <strong>{person.name}</strong>

@@ -1,4 +1,5 @@
 import { ChevronRight, Phone, Radio } from 'lucide-react'
+import personProfileMascot from '../../../assets/mascot-profile.png'
 import alertMascot from '../../../assets/mascot/alert.png'
 import profileMascot from '../../../assets/mascot/normal.png'
 import { createHomeDashboard } from '../utils/homeDashboard'
@@ -16,7 +17,7 @@ function DashboardHeader({ person, warning }) {
 function PersonOverview({ model, onOpenPerson }) {
   return (
     <button className="home-dashboard__person" type="button" onClick={onOpenPerson}>
-      <span className="home-dashboard__avatar"><img src={profileMascot} alt="" /></span>
+      <span className="home-dashboard__avatar"><img src={personProfileMascot} alt="" /></span>
       <span className="home-dashboard__person-text">
         <strong>{model.person.name} 님</strong>
         <small>모니터링 중 · 센서 {model.sensors.length}개</small>
