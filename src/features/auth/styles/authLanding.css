@@ -128,8 +128,22 @@
   text-underline-offset: 4px;
 }
 
+.auth-landing__home-link {
+  align-self: center;
+  margin-top: -8px;
+  padding: 4px 8px;
+  border: 0;
+  color: var(--color-primary);
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 .auth-landing__login:focus-visible,
-.auth-landing__signup:focus-visible {
+.auth-landing__signup:focus-visible,
+.auth-landing__home-link:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 3px;
 }
