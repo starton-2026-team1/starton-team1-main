@@ -97,7 +97,7 @@ function PersonRegistrationPage({ initialPerson, onBack, onDelete, onRegister })
 
   return (
     <>
-      <StepFormLayout ariaLabel={`대상자 정보 ${initialPerson ? '수정 및 삭제' : '등록'}`} currentStep={step} totalSteps={steps.length} onBack={handleBack} onSubmit={handleSubmit} actionDisabled={isSubmitting || isDeleting} actionLabel={isSubmitting ? `${initialPerson ? '수정' : '등록'} 중...` : step === steps.length - 1 ? `${initialPerson ? '수정' : '등록'}하기` : isOptionalStep && !form[current.field] ? '건너뛰기' : '다음'} secondaryActionLabel={initialPerson && step === 0 ? '삭제' : undefined} secondaryActionDisabled={isSubmitting || isDeleting} onSecondaryAction={() => setShowDeleteConfirm(true)}>
+      <StepFormLayout ariaLabel={`대상자 정보 ${initialPerson ? '수정 및 삭제' : '등록'}`} currentStep={step} totalSteps={steps.length} onBack={handleBack} onSubmit={handleSubmit} actionDisabled={isSubmitting || isDeleting} actionLabel={isSubmitting ? `${initialPerson ? '수정' : '등록'} 중...` : step === steps.length - 1 ? `${initialPerson ? '수정' : '등록'}하기` : isOptionalStep && !form[current.field] ? '건너뛰기' : '다음'} secondaryActionLabel={initialPerson && step === 0 ? '대상자 삭제' : undefined} secondaryActionDisabled={isSubmitting || isDeleting} onSecondaryAction={() => setShowDeleteConfirm(true)}>
         <h1 className="step-form-question">{current.question}</h1>
         <p className="step-form-description">{current.description}</p>
         {renderInput()}

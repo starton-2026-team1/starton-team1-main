@@ -86,7 +86,7 @@ function WarningStatus({ model, onOpenHistory }) {
         <button className="primary-action" type="button" onClick={callTarget} disabled={!model.person.phone}>
           <Phone aria-hidden="true" />대상자에게 전화하기
         </button>
-        <button type="button" onClick={onOpenHistory}>센서 기록 확인<ChevronRight aria-hidden="true" /></button>
+        <button type="button" onClick={onOpenHistory}>센서 기록 확인</button>
       </div>
 
       <section className="home-dashboard__section home-evidence" aria-labelledby="situation-evidence-title">

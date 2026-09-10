@@ -4,6 +4,7 @@ import './confirmDialog.css'
 function ConfirmDialog({
   cancelLabel = '취소',
   confirmLabel = '확인',
+  confirmingLabel = '삭제 중...',
   description,
   isConfirming = false,
   onCancel,
@@ -33,7 +34,7 @@ function ConfirmDialog({
         <div className="confirm-dialog__actions">
           <button type="button" onClick={onCancel} disabled={isConfirming}>{cancelLabel}</button>
           <button className="confirm-dialog__confirm" type="button" onClick={onConfirm} disabled={isConfirming} autoFocus>
-            {isConfirming ? '삭제 중...' : confirmLabel}
+            {isConfirming ? confirmingLabel : confirmLabel}
           </button>
         </div>
       </section>

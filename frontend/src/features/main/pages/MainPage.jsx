@@ -394,6 +394,7 @@ function MainPage() {
   const [sensorEvents, setSensorEvents] = useState([])
   const [sensorToDelete, setSensorToDelete] = useState(null)
   const [isDeletingSensor, setIsDeletingSensor] = useState(false)
+  const [personToStopMonitoring, setPersonToStopMonitoring] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [apiError, setApiError] = useState('')
   const activeItem = navigationItems.find(({ id }) => id === activePage)
@@ -456,6 +457,7 @@ function MainPage() {
       setApiError(error.message || '모니터링을 중지하지 못했어요.')
     } finally {
       setUpdatingPersonId(null)
+      setPersonToStopMonitoring(null)
     }
   }
 
@@ -510,7 +512,7 @@ function MainPage() {
             sensors={registeredSensors}
             onConnectSensor={() => setActivePage('sensor')}
             onEditPerson={setEditingPerson}
-            onStopMonitoring={stopMonitoring}
+            onStopMonitoring={setPersonToStopMonitoring}
             updatingPersonId={updatingPersonId}
           />
         )
@@ -665,6 +667,16 @@ function MainPage() {
             isConfirming={isDeletingSensor}
             onCancel={() => setSensorToDelete(null)}
             onConfirm={confirmSensorDeletion}
+          />
+        )}
+        {personToStopMonitoring && (
+          <ConfirmDialog
+            title="모니터링을 중지할까요?"
+            confirmLabel="중지"
+            confirmingLabel="중지 중..."
+            isConfirming={updatingPersonId === personToStopMonitoring.id}
+            onCancel={() => setPersonToStopMonitoring(null)}
+            onConfirm={() => stopMonitoring(personToStopMonitoring)}
           />
         )}
         {apiError && <NoticeToast>{apiError}</NoticeToast>}
