@@ -29,3 +29,11 @@ export async function createPerson(person) {
   })
   return toPerson(created)
 }
+
+export async function updatePersonMonitoringStatus(personId, monitoringStatus) {
+  const updated = await apiRequest(`/people/${personId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ monitoring_status: monitoringStatus }),
+  })
+  return toPerson(updated)
+}

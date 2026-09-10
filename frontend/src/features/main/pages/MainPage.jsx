@@ -16,7 +16,7 @@ import {
   UserRound,
   UsersRound,
 } from 'lucide-react'
-import { createPerson, getPeople } from '../../../api/people'
+import { createPerson, getPeople, updatePersonMonitoringStatus } from '../../../api/people'
 import { getSensorEvents } from '../../../api/sensorEvents'
 import { createSensor, getSensors } from '../../../api/sensors'
 import mascot from '../../../assets/mascot.png'
@@ -320,7 +320,6 @@ function MainPage() {
   const [activePage, setActivePage] = useState('home')
   const [isRegisteringPerson, setIsRegisteringPerson] = useState(false)
   const [isRegisteringSensor, setIsRegisteringSensor] = useState(false)
-  const [isRecordingStarted, setIsRecordingStarted] = useState(false)
   const [registeredPeople, setRegisteredPeople] = useState([])
   const [registeredSensors, setRegisteredSensors] = useState([])
   const [sensorEvents, setSensorEvents] = useState([])
@@ -331,6 +330,7 @@ function MainPage() {
   const hasLinkedSensor = Boolean(primaryPerson) && registeredSensors.some(
     ({ personId }) => personId === primaryPerson.id,
   )
+  const isRecordingStarted = primaryPerson?.monitoringStatus === 'ACTIVE'
 
   useEffect(() => {
     let isActive = true
@@ -358,6 +358,17 @@ function MainPage() {
     return () => window.clearTimeout(timer)
   }, [apiError])
 
+  const startRecording = async () => {
+    try {
+      const updatedPerson = await updatePersonMonitoringStatus(primaryPerson.id, 'ACTIVE')
+      setRegisteredPeople((people) => people.map((person) => (
+        person.id === updatedPerson.id ? updatedPerson : person
+      )))
+    } catch (error) {
+      setApiError(error.message || '모니터링을 시작하지 못했어요.')
+    }
+  }
+
   const renderPage = () => {
     if (isLoading) {
       return <EmptyState title="정보를 불러오고 있어요" description="잠시만 기다려 주세요." />
@@ -374,7 +385,7 @@ function MainPage() {
           hasSensor={hasLinkedSensor}
           onAddPerson={() => setIsRegisteringPerson(true)}
           onConnectSensor={() => setActivePage('sensor')}
-          onStartRecording={() => setIsRecordingStarted(true)}
+          onStartRecording={startRecording}
         />
       )
     }
