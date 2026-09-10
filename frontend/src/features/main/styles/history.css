@@ -304,9 +304,10 @@
 
 .history-filter-list {
   display: flex;
-  gap: 8px;
+  gap: 9px;
   overflow-x: auto;
-  padding-bottom: 4px;
+  margin: 0 -2px;
+  padding: 2px 2px 6px;
   scrollbar-width: none;
 }
 
@@ -316,21 +317,36 @@
 
 .history-filter-list button {
   flex: 0 0 auto;
-  min-height: 36px;
-  padding: 0 16px;
-  border: 1px solid #dfe5ee;
-  border-radius: 18px;
-  color: var(--color-placeholder);
-  background: #fff;
+  min-height: 38px;
+  padding: 0 17px;
+  border: 1px solid rgb(84 119 189 / 22%);
+  border-radius: 999px;
+  color: var(--color-primary-soft);
+  background: rgb(255 255 255 / 72%);
+  box-shadow: 0 2px 8px rgb(16 42 107 / 4%);
   font: inherit;
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 650;
+  white-space: nowrap;
   cursor: pointer;
+  transition: color 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .history-filter-list button.is-active {
   border-color: var(--color-primary);
   color: #fff;
   background: var(--color-primary);
+  box-shadow: 0 5px 12px rgb(36 107 253 / 22%);
+}
+
+.history-filter-list button:active {
+  transform: scale(0.97);
+}
+
+.history-filter-list button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .history-record-count {
