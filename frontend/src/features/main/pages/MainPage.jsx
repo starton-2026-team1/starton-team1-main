@@ -254,8 +254,16 @@ function PeoplePage({ people, onConnectSensor, onEditPerson, onStopMonitoring, s
 const sensorStatusLabels = {
   normal: '정상',
   connecting: '연결 중',
-  disconnected: '연결 끊김',
+  unstable: '연결 불안정',
+  disconnected: '끊김',
 }
+
+const sensorStatusGuide = [
+  { status: 'normal', label: '정상' },
+  { status: 'connecting', label: '연결 중' },
+  { status: 'unstable', label: '연결 불안정' },
+  { status: 'disconnected', label: '끊김' },
+]
 
 function SensorPage({ onAddSensor, people, sensors }) {
   const [openMenuId, setOpenMenuId] = useState(null)
@@ -314,6 +322,14 @@ function SensorPage({ onAddSensor, people, sensors }) {
           )
         })}
       </div>
+      <section className="sensor-status-guide" aria-labelledby="sensor-status-guide-title">
+        <h2 id="sensor-status-guide-title">센서 연결 상태</h2>
+        <div>
+          {sensorStatusGuide.map(({ status, label }) => (
+            <span className={`sensor-status sensor-status--${status}`} key={status}>{label}</span>
+          ))}
+        </div>
+      </section>
     </div>
   )
 }

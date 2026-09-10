@@ -3,6 +3,7 @@ import { apiRequest } from './client'
 const statusToView = {
   CONNECTED: 'normal',
   CONNECTING: 'connecting',
+  UNSTABLE: 'unstable',
   DISCONNECTED: 'disconnected',
   PAUSED: 'disconnected',
 }
