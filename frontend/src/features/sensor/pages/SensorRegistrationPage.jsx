@@ -15,7 +15,7 @@ const steps = [
   { field: 'location', question: '센서를 어디에 설치했나요?' },
 ]
 
-const initialForm = { serialNumber: '', personId: '', name: '', type: '', targetObject: '', location: '' }
+const initialForm = { serialNumber: '', personId: '', name: '', type: 'ultrasonic', targetObject: '', location: '' }
 
 function SensorRegistrationPage({ people, onBack, onRegister }) {
   const [form, setForm] = useState({ ...initialForm, personId: people[0]?.id || '' })
@@ -66,8 +66,7 @@ function SensorRegistrationPage({ people, onBack, onRegister }) {
       return <div className="step-choice-list">{people.map((person) => <button className={form.personId === person.id ? 'selected' : ''} type="button" key={person.id} onClick={() => update(person.id)}>{person.name}{form.personId === person.id && <Check aria-hidden="true" />}</button>)}</div>
     }
     if (current.field === 'type') {
-      const types = [['ultrasonic', '초음파 센서']]
-      return <div className="step-choice-list">{types.map(([value, label]) => <button className={form.type === value ? 'selected' : ''} type="button" key={value} onClick={() => update(value)}>{label}{form.type === value && <Check aria-hidden="true" />}</button>)}</div>
+      return <div className="step-choice-list"><button className="selected" type="button" aria-pressed="true">초음파 센서<Check aria-hidden="true" /></button></div>
     }
     const placeholders = { serialNumber: '센서 고유번호', name: '예: 거실 센서', targetObject: '예: 냉장고, 현관문', location: '예: 주방, 현관' }
     return <UnderlinedInput id={`sensor-${current.field}`} value={form[current.field]} placeholder={placeholders[current.field]} autoFocus error={error} onChange={(event) => update(current.field === 'serialNumber' ? event.target.value.toUpperCase() : event.target.value)} action={form[current.field].trim() ? <Check className="input-check" aria-label="입력 완료" /> : null} />
