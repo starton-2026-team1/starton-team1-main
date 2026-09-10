@@ -41,3 +41,7 @@ export async function createSensor(sensor) {
   // person_id와 target_object가 백엔드에 반영되기 전에도 현재 등록 화면은 유지한다.
   return toSensor({ ...payload, ...created })
 }
+
+export async function deleteSensor(sensorId) {
+  await apiRequest(`/sensors/${sensorId}`, { method: 'DELETE' })
+}

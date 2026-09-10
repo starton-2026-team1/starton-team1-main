@@ -20,11 +20,12 @@ import {
 } from 'lucide-react'
 import { createPerson, getPeople, updatePerson, updatePersonMonitoringStatus } from '../../../api/people'
 import { getSensorEvents } from '../../../api/sensorEvents'
-import { createSensor, getSensors } from '../../../api/sensors'
+import { createSensor, deleteSensor, getSensors } from '../../../api/sensors'
 import mascot from '../../../assets/mascot.png'
 import personProfileMascot from '../../../assets/mascot-profile.png'
 import emptyMascot from '../../../assets/mascot/empty.png'
 import NoticeToast from '../../../components/common/NoticeToast'
+import ConfirmDialog from '../../../components/common/ConfirmDialog'
 import DetailActionButtons from '../../../components/common/DetailActionButtons'
 import PersonRegistrationPage from '../../people/pages/PersonRegistrationPage'
 import SensorRegistrationPage from '../../sensor/pages/SensorRegistrationPage'
@@ -282,7 +283,7 @@ function SensorStatusIcon({ status, showLabel = false }) {
   )
 }
 
-function SensorPage({ onAddSensor, people, sensors }) {
+function SensorPage({ onAddSensor, onDeleteSensor, people, sensors }) {
   const [openMenuId, setOpenMenuId] = useState(null)
 
   const closeMenu = (event) => {
@@ -328,7 +329,15 @@ function SensorPage({ onAddSensor, people, sensors }) {
                   <div className="sensor-card__menu" role="menu">
                     <button type="button" role="menuitem" onClick={() => setOpenMenuId(null)}>센서 수정</button>
                     <button type="button" role="menuitem" onClick={() => setOpenMenuId(null)}>연결 해제</button>
-                    <button className="sensor-card__menu-danger" type="button" role="menuitem" onClick={() => setOpenMenuId(null)}>센서 삭제</button>
+                    <button
+                      className="sensor-card__menu-danger"
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        setOpenMenuId(null)
+                        onDeleteSensor(sensor)
+                      }}
+                    >센서 삭제</button>
                   </div>
                 )}
               </div>
@@ -357,6 +366,8 @@ function MainPage() {
   const [registeredPeople, setRegisteredPeople] = useState([])
   const [registeredSensors, setRegisteredSensors] = useState([])
   const [sensorEvents, setSensorEvents] = useState([])
+  const [sensorToDelete, setSensorToDelete] = useState(null)
+  const [isDeletingSensor, setIsDeletingSensor] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [apiError, setApiError] = useState('')
   const activeItem = navigationItems.find(({ id }) => id === activePage)
@@ -414,6 +425,20 @@ function MainPage() {
       setApiError(error.message || '모니터링을 중지하지 못했어요.')
     } finally {
       setUpdatingPersonId(null)
+    }
+  }
+
+  const confirmSensorDeletion = async () => {
+    if (!sensorToDelete) return
+    setIsDeletingSensor(true)
+    try {
+      await deleteSensor(sensorToDelete.id)
+      setRegisteredSensors((sensors) => sensors.filter(({ id }) => id !== sensorToDelete.id))
+      setSensorToDelete(null)
+    } catch (error) {
+      setApiError(error.message || '센서를 삭제하지 못했어요.')
+    } finally {
+      setIsDeletingSensor(false)
     }
   }
 
@@ -477,6 +502,7 @@ function MainPage() {
             sensors={registeredSensors}
             people={registeredPeople}
             onAddSensor={() => setIsRegisteringSensor(true)}
+            onDeleteSensor={setSensorToDelete}
           />
         )
       }
@@ -582,6 +608,15 @@ function MainPage() {
             )
           })}
         </nav>
+        {sensorToDelete && (
+          <ConfirmDialog
+            title="센서를 삭제할까요?"
+            confirmLabel="삭제하기"
+            isConfirming={isDeletingSensor}
+            onCancel={() => setSensorToDelete(null)}
+            onConfirm={confirmSensorDeletion}
+          />
+        )}
         {apiError && <NoticeToast>{apiError}</NoticeToast>}
       </section>
     </main>
