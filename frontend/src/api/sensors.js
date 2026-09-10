@@ -42,6 +42,20 @@ export async function createSensor(sensor) {
   return toSensor({ ...payload, ...created })
 }
 
+export async function updateSensor(sensorId, sensor) {
+  const payload = {
+    name: sensor.name,
+    location: sensor.location,
+    person_id: sensor.personId,
+    target_object: sensor.targetObject,
+  }
+  const updated = await apiRequest(`/sensors/${sensorId}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  })
+  return toSensor({ ...sensor, ...payload, ...updated })
+}
+
 export async function deleteSensor(sensorId) {
   await apiRequest(`/sensors/${sensorId}`, { method: 'DELETE' })
 }

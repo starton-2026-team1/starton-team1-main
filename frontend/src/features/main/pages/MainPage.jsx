@@ -17,7 +17,7 @@ import {
 } from 'lucide-react'
 import { createPerson, deletePerson, getPeople, updatePerson, updatePersonMonitoringStatus } from '../../../api/people'
 import { getSensorEvents } from '../../../api/sensorEvents'
-import { createSensor, deleteSensor, getSensors } from '../../../api/sensors'
+import { createSensor, deleteSensor, getSensors, updateSensor } from '../../../api/sensors'
 import mascot from '../../../assets/mascot.png'
 import personProfileMascot from '../../../assets/mascot-profile.png'
 import emptyMascot from '../../../assets/mascot/empty.png'
@@ -310,7 +310,7 @@ function SensorStatusIcon({ status, showLabel = false }) {
   )
 }
 
-function SensorPage({ onAddSensor, onDeleteSensor, people, sensors }) {
+function SensorPage({ onAddSensor, onDeleteSensor, onEditSensor, people, sensors }) {
   const [openMenuId, setOpenMenuId] = useState(null)
 
   const closeMenu = (event) => {
@@ -354,7 +354,14 @@ function SensorPage({ onAddSensor, onDeleteSensor, people, sensors }) {
                 </button>
                 {openMenuId === sensor.id && (
                   <div className="sensor-card__menu" role="menu">
-                    <button type="button" role="menuitem" onClick={() => setOpenMenuId(null)}>센서 수정</button>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        setOpenMenuId(null)
+                        onEditSensor(sensor)
+                      }}
+                    >센서 수정</button>
                     <button type="button" role="menuitem" onClick={() => setOpenMenuId(null)}>연결 해제</button>
                     <button
                       className="sensor-card__menu-danger"
@@ -391,6 +398,7 @@ function MainPage() {
   const [isRegisteringPerson, setIsRegisteringPerson] = useState(false)
   const [isRegisteringSensor, setIsRegisteringSensor] = useState(false)
   const [editingPerson, setEditingPerson] = useState(null)
+  const [editingSensor, setEditingSensor] = useState(null)
   const [updatingPersonId, setUpdatingPersonId] = useState(null)
   const [registeredPeople, setRegisteredPeople] = useState([])
   const [registeredSensors, setRegisteredSensors] = useState([])
@@ -542,6 +550,7 @@ function MainPage() {
             people={registeredPeople}
             onAddSensor={() => setIsRegisteringSensor(true)}
             onDeleteSensor={setSensorToDelete}
+            onEditSensor={setEditingSensor}
           />
         )
       }
@@ -634,6 +643,23 @@ function MainPage() {
           setRegisteredSensors((sensors) => [...sensors, created])
           setActivePage('sensor')
           setIsRegisteringSensor(false)
+        }}
+      />
+    )
+  }
+
+  if (editingSensor) {
+    return (
+      <SensorRegistrationPage
+        initialSensor={editingSensor}
+        people={registeredPeople}
+        onBack={() => setEditingSensor(null)}
+        onRegister={async (sensor) => {
+          const updated = await updateSensor(editingSensor.id, sensor)
+          setRegisteredSensors((sensors) => sensors.map((item) => (
+            item.id === updated.id ? updated : item
+          )))
+          setEditingSensor(null)
         }}
       />
     )
