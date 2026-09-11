@@ -52,10 +52,10 @@
 
 .onboarding-card {
   padding: 24px 18px 18px;
-  border: 1px solid #edf0f5;
-  border-radius: 24px;
+  border: var(--card-border);
+  border-radius: var(--card-radius);
   background: var(--color-card);
-  box-shadow: 0 8px 24px rgb(16 42 107 / 4%);
+  box-shadow: var(--card-shadow);
   text-align: center;
 }
 
@@ -257,10 +257,10 @@
   align-items: center;
   gap: 13px;
   padding: 17px;
-  border: 1px solid var(--color-card-border);
-  border-radius: 19px;
+  border: var(--card-border);
+  border-radius: var(--card-radius);
   background: var(--color-card);
-  box-shadow: 0 8px 22px rgb(16 42 107 / 6%);
+  box-shadow: var(--card-shadow);
 }
 
 .person-card__avatar {
@@ -395,11 +395,11 @@
   align-items: center;
   gap: 10px;
   padding: 13px 16px;
-  border: 1px solid var(--color-card-border);
-  border-radius: 20px;
+  border: var(--card-border);
+  border-radius: var(--card-radius);
   color: var(--color-text);
   background: var(--color-card);
-  box-shadow: 0 6px 18px rgb(16 42 107 / 5%);
+  box-shadow: var(--card-shadow);
   backdrop-filter: blur(14px);
   font: inherit;
   text-align: left;
@@ -458,10 +458,10 @@
 .person-detail-section,
 .person-notes-section {
   padding: 18px;
-  border: 1px solid var(--color-card-border);
-  border-radius: 20px;
+  border: var(--card-border);
+  border-radius: var(--card-radius);
   background: var(--color-card);
-  box-shadow: 0 6px 18px rgb(16 42 107 / 5%);
+  box-shadow: var(--card-shadow);
   backdrop-filter: blur(14px);
 }
 
@@ -503,11 +503,11 @@
   align-items: center;
   gap: 7px;
   padding: 0 18px;
-  border: 1px solid var(--color-card-border);
-  border-radius: 20px;
+  border: var(--card-border);
+  border-radius: var(--card-radius);
   color: var(--color-text);
   background: var(--color-card);
-  box-shadow: 0 6px 18px rgb(16 42 107 / 5%);
+  box-shadow: var(--card-shadow);
   backdrop-filter: blur(14px);
   font: inherit;
   font-size: 13px;
@@ -531,9 +531,10 @@
 .sensor-ready-card {
   margin-top: 16px;
   padding: 19px;
-  border: 1px solid #e8edf5;
-  border-radius: 20px;
-  background: #ffffff;
+  border: var(--card-border);
+  border-radius: var(--card-radius);
+  background: var(--color-card);
+  box-shadow: var(--card-shadow);
 }
 
 .person-section-heading {
@@ -712,10 +713,10 @@
   align-items: center;
   gap: 11px;
   padding: 11px 14px;
-  border: 1px solid var(--color-card-border);
-  border-radius: 19px;
+  border: var(--card-border);
+  border-radius: var(--card-radius);
   background: var(--color-card);
-  box-shadow: 0 6px 18px rgb(16 42 107 / 5%);
+  box-shadow: var(--card-shadow);
   backdrop-filter: blur(14px);
 }
 
@@ -895,10 +896,10 @@
   align-items: center;
   gap: 13px;
   padding: 16px;
-  border: 1px solid var(--color-card-border);
-  border-radius: 20px;
+  border: var(--card-border);
+  border-radius: var(--card-radius);
   background: var(--color-card);
-  box-shadow: 0 6px 18px rgb(16 42 107 / 5%);
+  box-shadow: var(--card-shadow);
 }
 
 .profile-card__avatar {
@@ -956,10 +957,10 @@
 
 .settings-list {
   overflow: hidden;
-  border: 1px solid var(--color-card-border);
-  border-radius: 20px;
+  border: var(--card-border);
+  border-radius: var(--card-radius);
   background: var(--color-card);
-  box-shadow: 0 6px 18px rgb(16 42 107 / 5%);
+  box-shadow: var(--card-shadow);
 }
 
 .settings-list button {

@@ -199,9 +199,10 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   margin-top: 16px;
-  border-radius: 18px;
+  border: var(--card-border);
+  border-radius: var(--card-radius);
   background: var(--color-card);
-  box-shadow: 0 6px 18px rgb(16 42 107 / 5%);
+  box-shadow: var(--card-shadow);
 }
 
 .history-metrics > div {
