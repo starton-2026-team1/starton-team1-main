@@ -1,7 +1,7 @@
 import mascot from '../../../assets/heart-ultrasound-mascot.png'
 import '../styles/authLanding.css'
 
-function AuthLandingPage({ onEmailLogin, onSignUp, onGoHome }) {
+function AuthLandingPage({ onEmailLogin, onSignUp }) {
   return (
     <main className="auth-landing">
       <section className="auth-landing__panel" aria-labelledby="auth-welcome-title">
@@ -32,9 +32,6 @@ function AuthLandingPage({ onEmailLogin, onSignUp, onGoHome }) {
           </button>
           <button className="auth-landing__signup" type="button" onClick={onSignUp}>
             처음이신가요? <span>회원가입</span>
-          </button>
-          <button className="auth-landing__home-link" type="button" onClick={onGoHome}>
-            임시 홈 바로가기
           </button>
         </div>
       </section>

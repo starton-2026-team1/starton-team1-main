@@ -1,10 +1,16 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api/v1'
+const TOKEN_KEY = 'starton_access_token'
+
+export const getAccessToken = () => window.sessionStorage.getItem(TOKEN_KEY)
+export const setAccessToken = (token) => window.sessionStorage.setItem(TOKEN_KEY, token)
+export const clearAccessToken = () => window.sessionStorage.removeItem(TOKEN_KEY)
 
 export async function apiRequest(path, options = {}) {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
+      ...(getAccessToken() ? { Authorization: `Bearer ${getAccessToken()}` } : {}),
       ...options.headers,
     },
   })

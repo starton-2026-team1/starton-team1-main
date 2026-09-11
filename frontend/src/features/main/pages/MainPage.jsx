@@ -122,12 +122,84 @@ function HomePage({ hasSensor, onAddPerson, onConnectSensor, onStartRecording, p
   )
 }
 
-function ProfilePage({ onThemeChange, theme }) {
+function ProfilePage({ onLogout, onThemeChange, onUserUpdate, theme, user }) {
   const [showThemeDialog, setShowThemeDialog] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [email, setEmail] = useState(user?.email || '')
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [error, setError] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
   const themeOptions = [
     { id: 'inverted', label: '반전', description: '회색 배경 · 흰색 카드' },
     { id: 'classic', label: '기본', description: '흰색 배경 · 회색 카드' },
   ]
+
+  const resetForm = () => {
+    setEmail(user?.email || '')
+    setCurrentPassword('')
+    setNewPassword('')
+    setError('')
+  }
+
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    setError('')
+
+    const normalizedEmail = email.trim()
+    const emailChanged = normalizedEmail !== user?.email
+    if (!emailChanged && !newPassword) {
+      setError('변경할 이메일 또는 새 비밀번호를 입력해 주세요.')
+      return
+    }
+
+    setIsSaving(true)
+    try {
+      await onUserUpdate({
+        current_password: currentPassword,
+        ...(emailChanged ? { email: normalizedEmail } : {}),
+        ...(newPassword ? { new_password: newPassword } : {}),
+      })
+      setCurrentPassword('')
+      setNewPassword('')
+      setIsEditing(false)
+    } catch (requestError) {
+      setError(requestError.message || '내 정보를 수정하지 못했어요.')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  if (isEditing) {
+    return (
+      <div className="profile-view">
+        <header className="page-header profile-edit__header">
+          <button type="button" onClick={() => { resetForm(); setIsEditing(false) }}>취소</button>
+          <h1>내 정보 수정</h1>
+          <span aria-hidden="true" />
+        </header>
+
+        <form className="profile-edit" onSubmit={handleSubmit}>
+          <label>
+            이메일
+            <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" required />
+          </label>
+          <label>
+            현재 비밀번호
+            <input type="password" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} autoComplete="current-password" required />
+          </label>
+          <label>
+            새 비밀번호 <small>변경할 때만 입력</small>
+            <input type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} autoComplete="new-password" minLength="8" placeholder="8자 이상" />
+          </label>
+          {error && <p className="profile-edit__error" role="alert">{error}</p>}
+          <button className="primary-action primary-action--wide" type="submit" disabled={isSaving}>
+            {isSaving ? '저장 중...' : '변경사항 저장'}
+          </button>
+        </form>
+      </div>
+    )
+  }
 
   return (
     <div className="profile-view">
@@ -135,11 +207,11 @@ function ProfilePage({ onThemeChange, theme }) {
         <h1>설정</h1>
       </header>
 
-      <section className="profile-card" aria-label="사용자 정보">
+      <button className="profile-card" type="button" onClick={() => setIsEditing(true)} aria-label="내 정보 수정">
         <div className="profile-card__avatar"><img src={mascot} alt="" /></div>
-        <div><strong>사용자</strong><span>이메일</span></div>
+        <div><strong>사용자</strong><span>{user?.email || '계정 정보를 확인해 주세요'}</span></div>
         <ChevronRight aria-hidden="true" />
-      </section>
+      </button>
 
       <div className="settings-sections">
         {profileSections.map(({ title, items }) => (
@@ -147,7 +219,14 @@ function ProfilePage({ onThemeChange, theme }) {
             <h2 id={`settings-${title}`}>{title}</h2>
             <div className="settings-list">
               {items.map((label) => (
-                <button key={label} type="button" onClick={() => label === '테마 설정' && setShowThemeDialog(true)}>
+                <button
+                  key={label}
+                  type="button"
+                  onClick={() => {
+                    if (label === '테마 설정') setShowThemeDialog(true)
+                    if (label === '내 정보 수정') setIsEditing(true)
+                  }}
+                >
                   <span className="settings-list__label">
                     {label}
                   </span>
@@ -159,7 +238,7 @@ function ProfilePage({ onThemeChange, theme }) {
         ))}
       </div>
 
-      <button className="logout-button" type="button">
+      <button className="logout-button" type="button" onClick={onLogout}>
         <LogOut aria-hidden="true" />
         로그아웃
       </button>
@@ -401,7 +480,7 @@ function SensorPage({ onAddSensor, onDeleteSensor, onEditSensor, onToggleConnect
   )
 }
 
-function MainPage() {
+function MainPage({ onLogout, onUserUpdate, user }) {
   const [theme, setTheme] = useState(() => window.localStorage.getItem('app-theme') || 'inverted')
   const [activePage, setActivePage] = useState('home')
   const [historyInitialTab, setHistoryInitialTab] = useState('analysis')
@@ -616,7 +695,15 @@ function MainPage() {
       return <HistoryPage events={sensorEvents} initialTab={historyInitialTab} people={registeredPeople} sensors={registeredSensors} />
     }
 
-    return <ProfilePage theme={theme} onThemeChange={setTheme} />
+    return (
+      <ProfilePage
+        theme={theme}
+        user={user}
+        onLogout={onLogout}
+        onThemeChange={setTheme}
+        onUserUpdate={onUserUpdate}
+      />
+    )
   }
 
   if (isRegisteringPerson) {

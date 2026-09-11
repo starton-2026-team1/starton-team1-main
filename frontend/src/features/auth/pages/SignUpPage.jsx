@@ -17,6 +17,8 @@ function SignUpPage({ onBack, onSignUp }) {
   const [emailError, setEmailError] = useState('')
   const [passwordError, setPasswordError] = useState('')
   const [confirmError, setConfirmError] = useState('')
+  const [signUpError, setSignUpError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const confirmEmail = () => {
     const validationError = getEmailError(email)
@@ -56,7 +58,7 @@ function SignUpPage({ onBack, onSignUp }) {
     setConfirmError(nextPasswordConfirm === password ? '' : '비밀번호가 일치하지 않아요.')
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
 
     if (!emailConfirmed) {
@@ -75,7 +77,15 @@ function SignUpPage({ onBack, onSignUp }) {
     setConfirmError(nextConfirmError)
 
     if (!nextEmailError && !nextPasswordError && !nextConfirmError && onSignUp) {
-      onSignUp({ email, password })
+      setIsSubmitting(true)
+      setSignUpError('')
+      try {
+        await onSignUp({ email, password })
+      } catch (error) {
+        setSignUpError(error.message || '회원가입하지 못했어요.')
+      } finally {
+        setIsSubmitting(false)
+      }
     }
   }
 
@@ -168,15 +178,16 @@ function SignUpPage({ onBack, onSignUp }) {
                 {!emailError && <Check className="input-check" aria-hidden="true" />}
               </div>
               {emailError && <p className="confirmed-email-error">{emailError}</p>}
+              {signUpError && <p className="confirmed-email-error" role="alert">{signUpError}</p>}
             </div>
           )}
 
           <button
             className="login-button"
             type="submit"
-            disabled={emailConfirmed ? !canSubmit : !isValidEmail(email)}
+            disabled={isSubmitting || (emailConfirmed ? !canSubmit : !isValidEmail(email))}
           >
-            {emailConfirmed ? '가입하기' : '다음'}
+            {isSubmitting ? '가입 중...' : emailConfirmed ? '가입하기' : '다음'}
           </button>
         </form>
       </section>

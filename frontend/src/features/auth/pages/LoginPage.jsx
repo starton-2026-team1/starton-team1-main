@@ -11,6 +11,8 @@ function LoginPage({ onBack, onLogin }) {
   const [emailConfirmed, setEmailConfirmed] = useState(false)
   const [passwordVisible, setPasswordVisible] = useState(false)
   const [emailError, setEmailError] = useState('')
+  const [loginError, setLoginError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const confirmEmail = () => {
     const validationError = getEmailError(email)
@@ -40,7 +42,7 @@ function LoginPage({ onBack, onLogin }) {
     setEmailError(getEmailError(nextEmail))
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
 
     if (!emailConfirmed) {
@@ -56,7 +58,15 @@ function LoginPage({ onBack, onLogin }) {
     }
 
     if (password && onLogin) {
-      onLogin({ email, password })
+      setIsSubmitting(true)
+      setLoginError('')
+      try {
+        await onLogin({ email, password })
+      } catch (error) {
+        setLoginError(error.message || '로그인하지 못했어요.')
+      } finally {
+        setIsSubmitting(false)
+      }
     }
   }
 
@@ -131,9 +141,10 @@ function LoginPage({ onBack, onLogin }) {
                 {!emailError && <Check className="input-check" aria-hidden="true" />}
               </div>
               {emailError && <p className="confirmed-email-error" id="confirmed-email-error">{emailError}</p>}
+              {loginError && <p className="confirmed-email-error" role="alert">{loginError}</p>}
 
-              <button className="login-button" type="submit" disabled={!password || Boolean(emailError)}>
-                로그인
+              <button className="login-button" type="submit" disabled={isSubmitting || !password || Boolean(emailError)}>
+                {isSubmitting ? '로그인 중...' : '로그인'}
               </button>
             </>
           )}

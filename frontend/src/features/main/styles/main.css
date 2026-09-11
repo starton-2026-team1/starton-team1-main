@@ -892,6 +892,7 @@
 
 .profile-card {
   display: grid;
+  width: 100%;
   grid-template-columns: 58px minmax(0, 1fr) 20px;
   align-items: center;
   gap: 13px;
@@ -900,6 +901,9 @@
   border-radius: var(--card-radius);
   background: var(--color-card);
   box-shadow: var(--card-shadow);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
 .profile-card__avatar {
@@ -917,6 +921,10 @@
   width: 54px;
   height: 54px;
   object-fit: contain;
+}
+
+.profile-card__avatar svg {
+  width: 28px;
 }
 
 .profile-card div:nth-child(2) {
@@ -940,6 +948,72 @@
 .settings-list button > svg:last-child {
   width: 18px;
   color: #9aa7be;
+}
+
+.profile-edit__header {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 48px;
+  align-items: center;
+}
+
+.profile-edit__header h1 {
+  text-align: center;
+}
+
+.profile-edit__header button {
+  padding: 8px 0;
+  border: 0;
+  color: var(--color-primary);
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.profile-edit {
+  display: grid;
+  gap: 18px;
+  margin-top: 26px;
+}
+
+.profile-edit label {
+  display: grid;
+  gap: 8px;
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.profile-edit label small {
+  color: var(--color-placeholder);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.profile-edit input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px 14px;
+  border: 1px solid #dfe5ef;
+  border-radius: 12px;
+  outline: none;
+  color: var(--color-text);
+  background: #ffffff;
+  font: inherit;
+}
+
+.profile-edit input:focus {
+  border-color: var(--color-primary);
+}
+
+.profile-edit__error {
+  margin: -6px 0 0;
+  color: var(--color-error);
+  font-size: 12px;
+}
+
+.profile-edit .primary-action:disabled {
+  opacity: 0.6;
+  cursor: wait;
 }
 
 .settings-sections {
