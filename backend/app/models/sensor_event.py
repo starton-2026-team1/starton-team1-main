@@ -16,8 +16,8 @@ class SensorEvent(Base):
     person_id: Mapped[int] = mapped_column(
         BigInteger, ForeignKey("people.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    sensor_id: Mapped[int] = mapped_column(
-        BigInteger, ForeignKey("sensors.id", ondelete="CASCADE"), nullable=False, index=True
+    sensor_id: Mapped[int | None] = mapped_column(
+        BigInteger, ForeignKey("sensors.id", ondelete="SET NULL"), nullable=True, index=True
     )
     detected_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, index=True)
     detected_value: Mapped[str] = mapped_column(String(255), nullable=False)

@@ -15,6 +15,10 @@ async def record_sensor_event(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Person not found"
         )
+    if data.sensor_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Sensor not found"
+        )
     sensor = await get_owned_sensor(session, data.sensor_id, user_id)
     if sensor is None:
         raise HTTPException(
