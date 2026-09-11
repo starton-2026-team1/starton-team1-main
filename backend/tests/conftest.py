@@ -9,6 +9,7 @@ from sqlalchemy.ext.compiler import compiles
 
 os.environ.setdefault("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
 os.environ.setdefault("JWT_SECRET_KEY", "test-secret-key-for-local-tests-only")
+os.environ.setdefault("DEVICE_API_KEY", "test-device-api-key")
 
 from app.core.database import get_db_session  # noqa: E402
 from app.main import app  # noqa: E402
