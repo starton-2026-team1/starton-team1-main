@@ -47,6 +47,12 @@ async def get_owned_sensor(
     )
 
 
+async def get_sensor_by_device_id(
+    session: AsyncSession, device_id: str
+) -> Sensor | None:
+    return await session.scalar(select(Sensor).where(Sensor.device_id == device_id))
+
+
 async def update_sensor(session: AsyncSession, sensor: Sensor, data: SensorUpdate) -> Sensor:
     for key, value in data.model_dump(exclude_unset=True).items():
         setattr(sensor, key, value)
