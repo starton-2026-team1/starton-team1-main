@@ -10,6 +10,9 @@ class SensorEvent(Base):
     __tablename__ = "sensor_events"
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    external_event_id: Mapped[str | None] = mapped_column(
+        String(100), nullable=True, unique=True, index=True
+    )
     person_id: Mapped[int] = mapped_column(
         BigInteger, ForeignKey("people.id", ondelete="CASCADE"), nullable=False, index=True
     )
