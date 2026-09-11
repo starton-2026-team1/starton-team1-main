@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from sqlalchemy.ext.compiler import compiles
 
 os.environ.setdefault("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
+os.environ.setdefault("JWT_SECRET_KEY", "test-secret-key-for-local-tests-only")
 
 from app.core.database import get_db_session  # noqa: E402
 from app.main import app  # noqa: E402
@@ -43,3 +44,13 @@ async def client() -> AsyncIterator[AsyncClient]:
 
     app.dependency_overrides.clear()
     await engine.dispose()
+
+
+@pytest_asyncio.fixture
+async def auth_headers(client: AsyncClient) -> dict[str, str]:
+    response = await client.post(
+        "/api/v1/auth/signup",
+        json={"email": "tester@example.com", "password": "password1234"},
+    )
+    token = response.json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
