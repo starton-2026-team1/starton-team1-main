@@ -17,6 +17,9 @@
   --color-danger-border: #f0caca;
   --color-danger-surface: #fff7f7;
   --color-shadow: rgba(37, 72, 138, 0.08);
+  --card-border: 1px solid var(--color-card);
+  --card-radius: 20px;
+  --card-shadow: 0 6px 18px rgb(16 42 107 / 5%);
 }
 
 :root[data-app-theme='classic'] {

@@ -5,6 +5,11 @@ uvicorn[standard]>=0.52,<1.0
 # Configuration
 pydantic-settings>=2.15,<3.0
 python-dotenv>=1.2,<2.0
+email-validator>=2.2,<3.0
+
+# Authentication
+pwdlib[argon2]>=0.3,<1.0
+PyJWT>=2.10,<3.0
 
 # Database and migrations
 sqlalchemy[asyncio]>=2.0,<3.0

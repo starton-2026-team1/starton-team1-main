@@ -36,11 +36,11 @@
   align-items: center;
   gap: 12px;
   padding: 10px 14px;
-  border: 1px solid #e8edf5;
-  border-radius: 22px;
+  border: var(--card-border);
+  border-radius: var(--card-radius);
   color: var(--color-text);
   background: var(--color-card);
-  box-shadow: 0 5px 16px rgb(16 42 107 / 5%);
+  box-shadow: var(--card-shadow);
   backdrop-filter: blur(14px);
   font: inherit;
   text-align: left;
@@ -93,10 +93,10 @@
   gap: 8px;
   margin-top: 14px;
   padding: 20px;
-  border: 1px solid #e8edf5;
-  border-radius: 22px;
+  border: var(--card-border);
+  border-radius: var(--card-radius);
   background: var(--color-card);
-  box-shadow: 0 8px 22px rgb(16 42 107 / 6%);
+  box-shadow: var(--card-shadow);
 }
 
 .home-status-card__mascot {
@@ -232,10 +232,10 @@
   gap: 13px;
   margin-top: 18px;
   padding: 17px;
-  border: 1px solid var(--color-card-border);
-  border-radius: 20px;
+  border: var(--card-border);
+  border-radius: var(--card-radius);
   background: var(--color-card);
-  box-shadow: 0 6px 18px rgb(16 42 107 / 5%);
+  box-shadow: var(--card-shadow);
 }
 
 .home-recent-card__icon,
@@ -356,10 +356,10 @@
   grid-template-columns: 44px minmax(0, 1fr);
   gap: 13px;
   padding: 18px;
-  border: 1px solid var(--color-card-border);
-  border-radius: 20px;
+  border: var(--card-border);
+  border-radius: var(--card-radius);
   background: var(--color-card);
-  box-shadow: 0 5px 16px rgb(16 42 107 / 5%);
+  box-shadow: var(--card-shadow);
 }
 
 .home-evidence strong {
