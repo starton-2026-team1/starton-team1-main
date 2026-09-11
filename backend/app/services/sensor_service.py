@@ -14,22 +14,6 @@ from app.repositories.sensor_repository import (
 from app.schemas.sensor import SensorCreate, SensorUpdate
 
 
-async def register_sensor(
-    session: AsyncSession, user_id: int, data: SensorCreate
-) -> Sensor:
-    if await get_owned_person(session, data.person_id, user_id) is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Person not found"
-        )
-    try:
-        return await create_sensor(session, data)
-    except IntegrityError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="device_id is already registered",
-        ) from exc
-
-
 async def find_sensor_or_404(
     session: AsyncSession, sensor_id: int, user_id: int
 ) -> Sensor:
@@ -50,6 +34,23 @@ async def find_owned_sensor_or_404(
     return sensor
 
 
+async def register_sensor(
+    session: AsyncSession, user_id: int, data: SensorCreate
+) -> Sensor:
+    if await get_owned_person(session, data.person_id, user_id) is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Person not found"
+        )
+    try:
+        return await create_sensor(session, data)
+
+    except IntegrityError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="device_id is already registered",
+        ) from exc
+
+
 async def update_registered_sensor(
     session: AsyncSession, sensor_id: int, user_id: int, data: SensorUpdate
 ) -> Sensor:
@@ -59,7 +60,14 @@ async def update_registered_sensor(
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Person not found"
             )
-    return await update_sensor(session, sensor, data)
+    try:
+        return await update_sensor(session, sensor, data)
+
+    except IntegrityError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="device_id is already registered",
+        ) from exc
 
 
 async def remove_sensor(session: AsyncSession, sensor_id: int, user_id: int) -> None:
