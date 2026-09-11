@@ -5,7 +5,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class SensorEventCreate(BaseModel):
     person_id: int
-    sensor_id: int
+    sensor_id: int | None = None
     detected_at: datetime
     detected_value: str = Field(min_length=1, max_length=255)
     sensor_status: str = Field(max_length=30)
