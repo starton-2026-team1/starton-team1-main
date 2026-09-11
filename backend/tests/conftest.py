@@ -3,7 +3,7 @@ from collections.abc import AsyncIterator
 
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
-from sqlalchemy import BigInteger
+from sqlalchemy import BigInteger, event
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.ext.compiler import compiles
 
@@ -23,6 +23,13 @@ def compile_big_integer_for_sqlite(_type: BigInteger, _compiler: object, **_kwar
 @pytest_asyncio.fixture
 async def client() -> AsyncIterator[AsyncClient]:
     engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+
+    @event.listens_for(engine.sync_engine, "connect")
+    def enable_sqlite_foreign_keys(dbapi_connection: object, _record: object) -> None:
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
+
     session_factory = async_sessionmaker(engine, expire_on_commit=False)
 
     async with engine.begin() as connection:
