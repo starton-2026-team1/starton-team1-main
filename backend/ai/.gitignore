@@ -1,0 +1,5 @@
+myenv/
+data/
+model/
+img/
+__pycache__/
