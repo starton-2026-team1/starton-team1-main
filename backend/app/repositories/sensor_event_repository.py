@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.person import Person
 from app.models.sensor_event import SensorEvent
-from app.schemas.sensor_event import SensorEventCreate
+from app.schemas.sensor_event import DeviceEventCreate, SensorEventCreate
 
 
 async def create_sensor_event(
@@ -14,6 +14,37 @@ async def create_sensor_event(
     await session.flush()
     await session.refresh(event)
     return event
+
+
+async def create_device_sensor_event(
+    session: AsyncSession,
+    data: DeviceEventCreate,
+    person_id: int,
+    sensor_id: int,
+    sensor_status: str,
+) -> SensorEvent:
+    event = SensorEvent(
+        external_event_id=data.event_id,
+        person_id=person_id,
+        sensor_id=sensor_id,
+        detected_at=data.detected_at,
+        detected_value=data.detected_value,
+        sensor_status=sensor_status,
+    )
+    session.add(event)
+    await session.flush()
+    await session.refresh(event)
+    return event
+
+
+async def get_sensor_event_by_external_id(
+    session: AsyncSession, external_event_id: str
+) -> SensorEvent | None:
+    return await session.scalar(
+        select(SensorEvent).where(
+            SensorEvent.external_event_id == external_event_id
+        )
+    )
 
 
 async def list_sensor_events(
