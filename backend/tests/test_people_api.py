@@ -29,10 +29,28 @@ async def test_person_crud(client: AsyncClient, auth_headers: dict[str, str]) ->
     assert update_response.status_code == 200
     assert update_response.json()["monitoring_status"] == "ACTIVE"
 
+    sensor_response = await client.post(
+        "/api/v1/sensors",
+        json={
+            "name": "삭제 확인 센서",
+            "location": "현관",
+            "device_id": "CASCADE-SENSOR-001",
+            "person_id": person_id,
+            "target_object": "현관문",
+            "status": "CONNECTED",
+        },
+        headers=auth_headers,
+    )
+    assert sensor_response.status_code == 201
+
     delete_response = await client.delete(
         f"/api/v1/people/{person_id}", headers=auth_headers
     )
     assert delete_response.status_code == 204
+
+    sensors_response = await client.get("/api/v1/sensors", headers=auth_headers)
+    assert sensors_response.status_code == 200
+    assert sensors_response.json() == []
 
     missing_response = await client.get(
         f"/api/v1/people/{person_id}", headers=auth_headers
