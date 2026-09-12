@@ -44,7 +44,7 @@ def run_pipeline(log_buffer, ae_model, lstm_model):
 if __name__ == "__main__":
     import os
     # 모델 파일 확인
-    if not os.path.exists("model/autoencoder.keras") or not os.path.exists("model/lstm_classifier.keras"):
+    if not os.path.exists("model/autoencoder.keras") or not os.path.exists("model/lstm.keras"):
         print("먼저 step3, step4를 실행해 모델을 학습시키세요.")
         exit()
 
