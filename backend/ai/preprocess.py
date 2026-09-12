@@ -1,89 +1,82 @@
-"""
-Step 2: 데이터 전처리
-논문 3.2 구현
-
-입력 feature (총 36차원):
- - 시(hour): 24개 (one-hot)
- - 분(minute): 6개 → 0~9, 10~19, ..., 50~59 (one-hot)
- - 센서번호: 5개 (one-hot)
- - 발생횟수: 1개 (정규화 0~1)
-"""
-
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import MinMaxScaler
-import pickle
-    
-MINUTE_BINS = [0, 10, 20, 30, 40, 50]  # 6개 구간
-
-
+ 
+MAX_DIST = 450.0  # 센서 최대 감지 거리 (cm)
+SENSORS  = ["door", "fridge", "bed", "bathroom", "living"]
+ 
+ 
 def minute_to_bin(m):
     """분 → 구간 인덱스 (0~5)"""
     return m // 10
-
-
+ 
+ 
+def make_feature(hour, minute_bin, sensor_vals: dict):
+    h_vec = [0] * 24
+    h_vec[int(hour) % 24] = 1
+ 
+    m_vec = [0] * 6
+    m_vec[int(minute_bin) % 6] = 1
+ 
+    s_vec = []
+    for s in SENSORS:
+        v = sensor_vals.get(s, MAX_DIST)
+        if v is None or (isinstance(v, float) and np.isnan(v)) or v < 0:
+            v = MAX_DIST
+        s_vec.append(float(np.clip(v, 0, MAX_DIST)) / MAX_DIST)
+ 
+    feature = h_vec + m_vec + s_vec
+    assert len(feature) == 35, f"feature 크기 오류: {len(feature)}"
+    return feature
+ 
+ 
 def preprocess(df):
-    """
-    DataFrame → numpy array (shape: [n, 36])
-    """
     X = []
     for _, row in df.iterrows():
-        h, m, s = map(int, row["time"].split(":"))
-        sensor = int(row["sensor"])
-        count = int(row["count"])
+        h, m, _ = map(int, row["time"].split(":"))
         m_bin = minute_to_bin(m)
-
-        # One-hot: 시 (24차원)
-        hour_vec = [0] * 24
-        hour_vec[h] = 1
-
-        # One-hot: 분 (6차원)
-        min_vec = [0] * 6
-        min_vec[m_bin] = 1
-
-        # One-hot: 센서 (5차원)
-        sensor_vec = [0] * 5
-        sensor_vec[sensor - 1] = 1
-
-        # 발생횟수: 정규화 (1차원) — 최대값 414 가정 (논문 기준)
-        count_norm = count / 414.0
-
-        feature = hour_vec + min_vec + sensor_vec + [count_norm]
-        assert len(feature) == 36, f"feature 크기 오류: {len(feature)}"
+ 
+        sensor_vals = {
+            "door":     row.get("door_dist",     MAX_DIST),
+            "fridge":   row.get("fridge_dist",   MAX_DIST),
+            "bed":      row.get("bed_dist",       MAX_DIST),
+            "bathroom": row.get("bathroom_dist",  MAX_DIST),
+            "living":   row.get("living_dist",    MAX_DIST),
+        }
+ 
+        feature = make_feature(h, m_bin, sensor_vals)
         X.append(feature)
-
+ 
     return np.array(X, dtype=np.float32)
-
-
+ 
+ 
 def preprocess_labels(df):
-    """라벨 → one-hot (정상:0, 불면:1, 반복:2)"""
-    labels = df["label"].values
-    n = len(labels)
-    Y = np.zeros((n, 3), dtype=np.float32)
+    """라벨 컬럼 → one-hot (정상:0, 불면:1, 반복행동:2)"""
+    label_map = {"정상": 0, "불면": 1, "반복행동": 2}
+    labels = df["label"].map(label_map).values
+    Y = np.zeros((len(labels), 3), dtype=np.float32)
     for i, l in enumerate(labels):
         Y[i, int(l)] = 1
     return Y
-
-
+ 
+ 
 if __name__ == "__main__":
-    # 정상 데이터 전처리
+    # ── 정상 데이터 전처리 ─────────────────────────────
     normal_df = pd.read_csv("data/normal_data.csv")
     X_normal = preprocess(normal_df)
     np.save("X_normal.npy", X_normal)
-    print(f"✅ 정상 데이터 전처리 완료: shape={X_normal.shape}")
+    print(f"정상 데이터 전처리 완료: shape={X_normal.shape}")
     print("  앞 3행 예시:")
     print(X_normal[:3])
-
-    # 이상 행동 데이터 전처리
+ 
+    # ── 이상 데이터 전처리 ────────────────────────────
     abnormal_df = pd.read_csv("data/abnormal_data.csv")
     X_abnormal = preprocess(abnormal_df)
     Y_abnormal = preprocess_labels(abnormal_df)
     np.save("data/X_abnormal.npy", X_abnormal)
     np.save("data/Y_abnormal.npy", Y_abnormal)
-    print(f"\n이상 행동 데이터 전처리 완료: X={X_abnormal.shape}, Y={Y_abnormal.shape}")
-
-    print("\n📊 라벨 분포:")
-    labels = abnormal_df["label"].value_counts().sort_index()
-    label_names = {0: "정상", 1: "불면", 2: "반복행동"}
-    for k, v in labels.items():
-        print(f"  {label_names[k]}: {v}개") # type: ignore
+    print(f"\n이상 데이터 전처리 완료: X={X_abnormal.shape}, Y={Y_abnormal.shape}")
+ 
+    print("\n라벨 분포:")
+    for name, count in abnormal_df["label"].value_counts().items():
+        print(f"  {name}: {count}개")
+ 
