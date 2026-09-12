@@ -1,16 +1,16 @@
 import pandas as pd
 import numpy as np
  
-MAX_DIST = 450.0  # 센서 최대 감지 거리 (cm)
-SENSORS  = ["door", "fridge", "bed", "bathroom", "living"]
+MAX_DIST = 450.0
+SENSORS  = ["bed", "bathroom", "living"]
  
  
 def minute_to_bin(m):
-    """분 → 구간 인덱스 (0~5)"""
     return m // 10
  
  
 def make_feature(hour, minute_bin, sensor_vals: dict):
+    """hour, minute_bin, 센서별 거리값 dict → 33차원 feature"""
     h_vec = [0] * 24
     h_vec[int(hour) % 24] = 1
  
@@ -25,20 +25,25 @@ def make_feature(hour, minute_bin, sensor_vals: dict):
         s_vec.append(float(np.clip(v, 0, MAX_DIST)) / MAX_DIST)
  
     feature = h_vec + m_vec + s_vec
-    assert len(feature) == 35, f"feature 크기 오류: {len(feature)}"
+    assert len(feature) == 33, f"feature 크기 오류: {len(feature)}"
     return feature
  
  
 def preprocess(df):
+    """
+    DataFrame → numpy array (shape: [n, 33])
+ 
+    df 필수 컬럼:
+      - time (str): "HH:MM:SS"
+      - bed_dist, bathroom_dist, living_dist (float, cm)
+    """
     X = []
     for _, row in df.iterrows():
         h, m, _ = map(int, row["time"].split(":"))
         m_bin = minute_to_bin(m)
  
         sensor_vals = {
-            "door":     row.get("door_dist",     MAX_DIST),
-            "fridge":   row.get("fridge_dist",   MAX_DIST),
-            "bed":      row.get("bed_dist",       MAX_DIST),
+            "bed":      row.get("bed_dist",      MAX_DIST),
             "bathroom": row.get("bathroom_dist",  MAX_DIST),
             "living":   row.get("living_dist",    MAX_DIST),
         }
@@ -63,10 +68,8 @@ if __name__ == "__main__":
     # ── 정상 데이터 전처리 ─────────────────────────────
     normal_df = pd.read_csv("data/normal_data.csv")
     X_normal = preprocess(normal_df)
-    np.save("X_normal.npy", X_normal)
+    np.save("data/X_normal.npy", X_normal)
     print(f"정상 데이터 전처리 완료: shape={X_normal.shape}")
-    print("  앞 3행 예시:")
-    print(X_normal[:3])
  
     # ── 이상 데이터 전처리 ────────────────────────────
     abnormal_df = pd.read_csv("data/abnormal_data.csv")
@@ -74,7 +77,7 @@ if __name__ == "__main__":
     Y_abnormal = preprocess_labels(abnormal_df)
     np.save("data/X_abnormal.npy", X_abnormal)
     np.save("data/Y_abnormal.npy", Y_abnormal)
-    print(f"\n이상 데이터 전처리 완료: X={X_abnormal.shape}, Y={Y_abnormal.shape}")
+    print(f"이상 데이터 전처리 완료: X={X_abnormal.shape}, Y={Y_abnormal.shape}")
  
     print("\n라벨 분포:")
     for name, count in abnormal_df["label"].value_counts().items():
