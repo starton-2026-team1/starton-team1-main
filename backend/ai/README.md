@@ -48,3 +48,5 @@ pip install tensorflow pandas numpy scikit-learn matplotlib
 ## 진행도
 
 2026-09-11 : 냉장고, 방 문 데이터 총합 16만개 수집
+
+수집된 데이터 : [링크](https://drive.google.com/drive/folders/1u3T5-lxgg6bSJd4KziEOuyRAnfeKIGvt?hl=ko)
