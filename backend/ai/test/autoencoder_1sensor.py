@@ -1,5 +1,5 @@
 """
-step3_autoencoder_1sensor.py: fridge 1개 센서 Autoencoder (31차원)
+step3_autoencoder_1sensor.py: fridge 거리값 1차원 Autoencoder
 """
 
 import numpy as np
@@ -8,7 +8,7 @@ from tensorflow.keras import layers
 import matplotlib.pyplot as plt
 
 
-def build_autoencoder(input_dim=31, hidden_dim=16):
+def build_autoencoder(input_dim=1, hidden_dim=8):
     inputs = keras.Input(shape=(input_dim,))
     encoded = layers.Dense(hidden_dim, activation="relu")(inputs)
     decoded = layers.Dense(input_dim, activation="sigmoid")(encoded)
@@ -27,8 +27,8 @@ def compute_anomaly_score(model, X, mse_max=None):
 
 
 if __name__ == "__main__":
-    X_normal   = np.load("test/data/X_normal_1s.npy")
-    X_abnormal = np.load("test/data/X_abnormal_1s.npy")
+    X_normal   = np.load("test/model/X_normal_1s.npy")
+    X_abnormal = np.load("test/model/X_abnormal_1s.npy")
 
     split = int(len(X_normal) * 0.8)
     X_train       = X_normal[:split]
@@ -36,7 +36,7 @@ if __name__ == "__main__":
 
     print(f"학습: {X_train.shape} | 테스트 정상: {X_test_normal.shape} | 이상: {X_abnormal.shape}")
 
-    ae = build_autoencoder(input_dim=31, hidden_dim=16)
+    ae = build_autoencoder(input_dim=1, hidden_dim=8)
     ae.summary()
 
     history = ae.fit(X_train, X_train, epochs=50, batch_size=32,
@@ -56,8 +56,8 @@ if __name__ == "__main__":
     print(f"정상 판별율: {normal_correct*100:.2f}%")
     print(f"이상 탐지율: {abnormal_detected*100:.2f}%")
 
-    np.save("model/threshold_1s.npy", np.array([THRESHOLD]))
-    np.save("model/mse_max_1s.npy",   np.array([mse_max]))
+    np.save("test/model/threshold_1s.npy", np.array([THRESHOLD]))
+    np.save("test/model/mse_max_1s.npy",   np.array([mse_max]))
 
     fig, axes = plt.subplots(1, 3, figsize=(18, 5))
     axes[0].plot(history.history["loss"], label="Train")
